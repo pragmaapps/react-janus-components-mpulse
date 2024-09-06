@@ -1,0 +1,51 @@
+{
+  "name": "react-janus-components",
+  "version": "1.1.2",
+  "description": "React components for Janus Plugins including Videoroom",
+  "main": "dist/react-janus-components.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --watch",
+    "build": "webpack"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "peerDependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "video-react": "^0.14.1",
+    "webrtc-adapter": "^7.2.9"
+  },
+  "devDependencies": {
+    "add": "^2.0.6",
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.5.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^3.2.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "style-loader": "^1.0.0",
+    "webpack": "^2.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avantrio/react-janus-components"
+  },
+  "keywords": [],
+  "author": "@manzzup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avantrio/react-janus-components/issues"
+  },
+  "homepage": "https://github.com/avantrio/react-janus-components"
+}
