@@ -1,33 +1,30 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
+  mode: 'production', // Set the build mode (development, production, none)
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'react-janus-components.js',
     library: 'reactJanusComponents',
-    libraryTarget: 'umd' 
+    libraryTarget: 'umd'
   },
   module: {
-    noParse: /^(react|react-dom)$/i,
     rules: [
       {
         test: /\.js$/,
         include: path.resolve(__dirname, 'src'),
-        exclude: /(node_modules|bower_components|build)/,
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          query: {
-            presets: ['babel-preset-env', 'babel-preset-react'],
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react']
           }
-        },
+        }
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -35,5 +32,4 @@ module.exports = {
     'react',
     'react-dom'
   ]
-
 };
