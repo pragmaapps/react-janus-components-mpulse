@@ -42,7 +42,7 @@ const JanusStreamer = React.forwardRef((
     }
     const streamingCallback = (_streaming, eventType, data) => {
         setStreaming(_streaming);
-        if (eventType === "onremotestream" && videoArea.current !== null) {
+        if (eventType === "onremotestream" && videoArea !== null && videoArea.current !== null) {
             mystream = data;
 
             console.log("[Attaching stream to the video element:]", videoArea);
