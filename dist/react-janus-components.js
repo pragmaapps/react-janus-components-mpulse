@@ -21537,6 +21537,7 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
 
     var handlePlayEvent = function handlePlayEvent(e) {
         console.log("[JanusStreamer] Live Stream Playing", e);
+        videoArea.current !== null && videoArea.current.video.video.play();
         streamIsLive(true);
     };
     var streamingCallback = function streamingCallback(_streaming, eventType, data) {

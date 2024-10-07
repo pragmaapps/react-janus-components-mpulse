@@ -38,6 +38,7 @@ const JanusStreamer = React.forwardRef((
 
     const handlePlayEvent = (e) => {
         console.log("[JanusStreamer] Live Stream Playing", e);
+        videoArea.current !== null && videoArea.current.video.video.play();
         streamIsLive(true);
     }
     const streamingCallback = (_streaming, eventType, data) => {
