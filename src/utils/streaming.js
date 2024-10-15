@@ -10,6 +10,16 @@ export function startStream(streaming, selectedStream) {
 	// No remote video yet
 }
 
+export function stopStream(streaming, selectedStream) {
+	console.log(`[JANUS] Pause Stream #${selectedStream}`);
+	if (selectedStream === undefined || selectedStream === null) {
+		return;
+	}
+	let body = { request: "stop" };
+	streaming.send({ message: body });
+	streaming.hangup();
+}
+
 export function subscribeStreaming(janus, opaqueId, callback) {
     let streaming = null;
 

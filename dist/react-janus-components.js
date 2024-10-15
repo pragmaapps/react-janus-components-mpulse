@@ -21491,7 +21491,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         setRecordedPlaybleFile = _ref.setRecordedPlaybleFile,
         showFramesRate = _ref.showFramesRate,
         playPauseButton = _ref.playPauseButton,
-        streamIsLive = _ref.streamIsLive;
+        streamIsLive = _ref.streamIsLive,
+        isRecodingActive = _ref.isRecodingActive;
 
     var videoArea = ref;
 
@@ -21522,14 +21523,22 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         if (!janus && !unmounted) {
             return;
         }
-
-        if (!unmounted) {
+        if (isRecodingActive) {
+            console.log("[JANUS STREAMER] USE EFFECT subscribeStreaming streaming : ", streaming);
+            if (streaming !== null) {
+                (0, _streaming2.stopStream)(streaming, streamId);
+                if (videoArea.current !== null) {
+                    videoArea.current.video.video.removeEventListener('play', handleStopEvent);
+                    videoArea.current.video.video.srcObject = null;
+                }
+                console.log("[JANUS STREAMER] USE EFFECT stopStream isRecodingActive : ", isRecodingActive);
+            }
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
         }
         return function () {
             unmounted = true;
         };
-    }, [janus]);
+    }, [janus, isRecodingActive]);
 
     var handleErrorVideo = function handleErrorVideo(e) {
         setRecordedPlaybleFile();
@@ -21539,6 +21548,10 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         console.log("[JanusStreamer] Live Stream Playing", e);
         videoArea.current !== null && videoArea.current.video.video.play();
         streamIsLive(true);
+    };
+    var handleStopEvent = function handleStopEvent(e) {
+        console.log("[JanusStreamer] Stop Stream", e);
+        streamIsLive(false);
     };
     var streamingCallback = function streamingCallback(_streaming, eventType, data) {
         setStreaming(_streaming);
@@ -22117,6 +22130,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.startStream = startStream;
+exports.stopStream = stopStream;
 exports.subscribeStreaming = subscribeStreaming;
 
 var _janus = __webpack_require__(12);
@@ -22133,6 +22147,16 @@ function startStream(streaming, selectedStream) {
 	var body = { "request": "watch", id: parseInt(selectedStream) };
 	streaming.send({ "message": body });
 	// No remote video yet
+}
+
+function stopStream(streaming, selectedStream) {
+	console.log("[JANUS] Pause Stream #" + selectedStream);
+	if (selectedStream === undefined || selectedStream === null) {
+		return;
+	}
+	var body = { request: "stop" };
+	streaming.send({ message: body });
+	streaming.hangup();
 }
 
 function subscribeStreaming(janus, opaqueId, callback) {

@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import $ from 'jquery';
 import Janus from './utils/janus';
-import { subscribeStreaming, startStream } from './utils/streaming';
+import { subscribeStreaming, startStream, stopStream } from './utils/streaming';
 import JanusStreamPlayer from './JanusStreamPlayer';
 import { Video } from 'video-react';
 
 const JanusStreamer = React.forwardRef((
     {
-        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate,playPauseButton, streamIsLive
+        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate, playPauseButton, streamIsLive, isRecodingActive
     }, ref) => {
     const videoArea = ref;
     const [playerState, setPlayerState] = useState("Ready");
@@ -22,14 +22,22 @@ const JanusStreamer = React.forwardRef((
         if (!janus && !unmounted) {
             return;
         }
-
-        if (!unmounted) {
+        if (isRecodingActive) {
+            console.log("[JANUS STREAMER] USE EFFECT subscribeStreaming streaming : ", streaming);
+            if (streaming !== null) {
+                stopStream(streaming, streamId)
+                if (videoArea.current !== null){
+                    videoArea.current.video.video.removeEventListener('play', handleStopEvent)
+                    videoArea.current.video.video.srcObject = null;
+                } 
+                console.log("[JANUS STREAMER] USE EFFECT stopStream isRecodingActive : ", isRecodingActive);
+            }
             subscribeStreaming(janus, opaqueId, streamingCallback);
         }
         return () => {
             unmounted = true;
         };
-    }, [janus])
+    }, [janus, isRecodingActive])
 
 
     const handleErrorVideo = (e) => {
@@ -40,6 +48,10 @@ const JanusStreamer = React.forwardRef((
         console.log("[JanusStreamer] Live Stream Playing", e);
         videoArea.current !== null && videoArea.current.video.video.play();
         streamIsLive(true);
+    }
+    const handleStopEvent = (e) => {
+        console.log("[JanusStreamer] Stop Stream", e);
+        streamIsLive(false);
     }
     const streamingCallback = (_streaming, eventType, data) => {
         setStreaming(_streaming);
