@@ -21492,7 +21492,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         showFramesRate = _ref.showFramesRate,
         playPauseButton = _ref.playPauseButton,
         streamIsLive = _ref.streamIsLive,
-        isRecodingActive = _ref.isRecodingActive;
+        isStreamStart = _ref.isStreamStart,
+        updateStreamLoading = _ref.updateStreamLoading;
 
     var videoArea = ref;
 
@@ -21516,29 +21517,33 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         janusBitrate = _useState8[0],
         setJanusBitrate = _useState8[1];
 
+    var _useState9 = (0, _react.useState)(false),
+        _useState10 = _slicedToArray(_useState9, 2),
+        unmounted = _useState10[0],
+        setUnmounted = _useState10[1];
+
     var mystream = null;
 
     (0, _react.useEffect)(function () {
-        var unmounted = false;
         if (!janus && !unmounted) {
             return;
         }
-        if (isRecodingActive) {
-            console.log("[JANUS STREAMER] USE EFFECT subscribeStreaming streaming : ", streaming);
+        if (!unmounted && !isStreamStart) {
+            (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+        }
+        if (isStreamStart) {
             if (streaming !== null) {
-                (0, _streaming2.stopStream)(streaming, streamId);
                 if (videoArea.current !== null) {
                     videoArea.current.video.video.removeEventListener('play', handleStopEvent);
                     videoArea.current.video.video.srcObject = null;
                 }
-                console.log("[JANUS STREAMER] USE EFFECT stopStream isRecodingActive : ", isRecodingActive);
+                (0, _streaming2.stopStream)(streaming, streamId);
             }
+            updateStreamLoading(true);
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
         }
-        return function () {
-            unmounted = true;
-        };
-    }, [janus, isRecodingActive]);
+        setUnmounted(true);
+    }, [janus, isStreamStart]);
 
     var handleErrorVideo = function handleErrorVideo(e) {
         setRecordedPlaybleFile();
@@ -21547,6 +21552,7 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
     var handlePlayEvent = function handlePlayEvent(e) {
         console.log("[JanusStreamer] Live Stream Playing", e);
         videoArea.current !== null && videoArea.current.video.video.play();
+        updateStreamLoading(false);
         streamIsLive(true);
     };
     var handleStopEvent = function handleStopEvent(e) {
