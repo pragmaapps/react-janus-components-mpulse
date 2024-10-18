@@ -21527,6 +21527,11 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         janusReload = _useState12[0],
         updateJanusReload = _useState12[1];
 
+    var _useState13 = (0, _react.useState)(false),
+        _useState14 = _slicedToArray(_useState13, 2),
+        mediaStreamAttached = _useState14[0],
+        updatMediaStreamAttached = _useState14[1];
+
     var mystream = null;
 
     (0, _react.useEffect)(function () {
@@ -21542,7 +21547,6 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         if (isStreamStart || janus && janusReload) {
             if (streaming !== null) {
                 if (videoArea.current !== null) {
-                    videoArea.current.video.video.removeEventListener('play', handleStopEvent);
                     videoArea.current.video.video.srcObject = null;
                 }
                 (0, _streaming2.stopStream)(streaming, streamId);
@@ -21564,10 +21568,6 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         updateStreamLoading(false);
         streamIsLive(true);
     };
-    var handleStopEvent = function handleStopEvent(e) {
-        console.log("[JanusStreamer] Stop Stream", e);
-        streamIsLive(false);
-    };
     var streamingCallback = function streamingCallback(_streaming, eventType, data) {
         setStreaming(_streaming);
         if (eventType === "onremotestream" && videoArea.current !== null) {
@@ -21576,8 +21576,11 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             console.log("[Attaching stream to the video element:]", videoArea);
             var videoPlayer = videoArea.current.video.video;
             _janus2.default.attachMediaStream(videoPlayer, mystream);
-            videoPlayer.addEventListener('error', handleErrorVideo);
-            videoPlayer.addEventListener('play', handlePlayEvent);
+            if (!mediaStreamAttached) {
+                videoPlayer.addEventListener('error', handleErrorVideo);
+                videoPlayer.addEventListener('play', handlePlayEvent);
+                updatMediaStreamAttached(true);
+            }
             if (_streaming.webrtcStuff.pc.iceConnectionState !== "completed" && _streaming.webrtcStuff.pc.iceConnectionState !== "connected") {
                 setPlayerState("Live");
             }
@@ -22171,7 +22174,7 @@ function stopStream(streaming, selectedStream) {
 	}
 	var body = { request: "stop" };
 	streaming.send({ message: body });
-	streaming.hangup();
+	streaming.detach();
 }
 
 function subscribeStreaming(janus, opaqueId, callback) {

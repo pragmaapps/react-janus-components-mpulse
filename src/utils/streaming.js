@@ -17,7 +17,7 @@ export function stopStream(streaming, selectedStream) {
 	}
 	let body = { request: "stop" };
 	streaming.send({ message: body });
-	streaming.hangup();
+	streaming.detach();
 }
 
 export function subscribeStreaming(janus, opaqueId, callback) {

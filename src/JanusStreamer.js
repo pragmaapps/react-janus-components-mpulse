@@ -15,7 +15,8 @@ const JanusStreamer = React.forwardRef((
     const [list, setList] = useState(null);
     const [janusBitrate, setJanusBitrate] = useState(null);
     const [unmounted, setUnmounted] = useState(false);
-    const [janusReload, updateJanusReload] = useState(false)
+    const [janusReload, updateJanusReload] = useState(false);
+    const [mediaStreamAttached, updatMediaStreamAttached] = useState(false);
 
     let mystream = null;
 
@@ -32,7 +33,6 @@ const JanusStreamer = React.forwardRef((
         if (isStreamStart || (janus && janusReload)) {
             if (streaming !== null) {
                 if (videoArea.current !== null){
-                    videoArea.current.video.video.removeEventListener('play', handleStopEvent)
                     videoArea.current.video.video.srcObject = null;
                 } 
                 stopStream(streaming, streamId);
@@ -55,10 +55,6 @@ const JanusStreamer = React.forwardRef((
         updateStreamLoading(false);
         streamIsLive(true);
     }
-    const handleStopEvent = (e) => {
-        console.log("[JanusStreamer] Stop Stream", e);
-        streamIsLive(false);
-    }
     const streamingCallback = (_streaming, eventType, data) => {
         setStreaming(_streaming);
         if (eventType === "onremotestream" && videoArea.current !== null) {
@@ -67,8 +63,11 @@ const JanusStreamer = React.forwardRef((
             console.log("[Attaching stream to the video element:]", videoArea);
             const videoPlayer = videoArea.current.video.video
             Janus.attachMediaStream(videoPlayer, mystream);
-            videoPlayer.addEventListener('error', handleErrorVideo);
-            videoPlayer.addEventListener('play', handlePlayEvent);
+            if (!mediaStreamAttached){
+                videoPlayer.addEventListener('error', handleErrorVideo);
+                videoPlayer.addEventListener('play', handlePlayEvent);
+                updatMediaStreamAttached(true);
+            }
             if (_streaming.webrtcStuff.pc.iceConnectionState !== "completed" &&
                 _streaming.webrtcStuff.pc.iceConnectionState !== "connected") {
                 setPlayerState("Live");
