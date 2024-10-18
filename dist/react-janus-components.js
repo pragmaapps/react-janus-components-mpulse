@@ -21522,16 +21522,24 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         unmounted = _useState10[0],
         setUnmounted = _useState10[1];
 
+    var _useState11 = (0, _react.useState)(false),
+        _useState12 = _slicedToArray(_useState11, 2),
+        janusReload = _useState12[0],
+        updateJanusReload = _useState12[1];
+
     var mystream = null;
 
     (0, _react.useEffect)(function () {
         if (!janus && !unmounted) {
             return;
         }
+        if (!janus && unmounted) {
+            updateJanusReload(true);
+        }
         if (!unmounted && !isStreamStart) {
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
         }
-        if (isStreamStart) {
+        if (isStreamStart || janus && janusReload) {
             if (streaming !== null) {
                 if (videoArea.current !== null) {
                     videoArea.current.video.video.removeEventListener('play', handleStopEvent);
@@ -21539,7 +21547,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
                 }
                 (0, _streaming2.stopStream)(streaming, streamId);
             }
-            updateStreamLoading(true);
+            janusReload ? streamIsLive(false) : updateStreamLoading(true);
+            updateJanusReload(false);
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
         }
         setUnmounted(true);

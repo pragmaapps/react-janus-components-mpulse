@@ -15,6 +15,7 @@ const JanusStreamer = React.forwardRef((
     const [list, setList] = useState(null);
     const [janusBitrate, setJanusBitrate] = useState(null);
     const [unmounted, setUnmounted] = useState(false);
+    const [janusReload, updateJanusReload] = useState(false)
 
     let mystream = null;
 
@@ -22,10 +23,13 @@ const JanusStreamer = React.forwardRef((
         if (!janus && !unmounted) {
             return;
         }
+        if(!janus && unmounted) {
+            updateJanusReload(true)
+        }
         if (!unmounted && !isStreamStart){
             subscribeStreaming(janus, opaqueId, streamingCallback);
         }
-        if (isStreamStart) {
+        if (isStreamStart || (janus && janusReload)) {
             if (streaming !== null) {
                 if (videoArea.current !== null){
                     videoArea.current.video.video.removeEventListener('play', handleStopEvent)
@@ -33,7 +37,8 @@ const JanusStreamer = React.forwardRef((
                 } 
                 stopStream(streaming, streamId);
             }
-            updateStreamLoading(true)
+            janusReload ? streamIsLive(false) : updateStreamLoading(true);
+            updateJanusReload(false);
             subscribeStreaming(janus, opaqueId, streamingCallback);
         }
         setUnmounted(true);
