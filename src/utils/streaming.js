@@ -84,9 +84,11 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 
 function reconnectStream(streaming) {
     Janus.log("Reconnecting stream...");
-    streaming.send({
-		"message": {
-			request: "watch", id: 1, refresh: true
+    streaming.createOffer({
+		media:{audioRecv:false, videoRecv:true, audioSend:false, videoSend: false},
+		iceRestart:true,
+		success:function(jsep) {
+			streaming.send({"message": {request: "watch", id: 1}, "jsep": jsep});
 		}
 	});
 }
