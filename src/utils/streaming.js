@@ -74,8 +74,9 @@ export function subscribeStreaming(janus, opaqueId, callback) {
             let state = streaming.webrtcStuff.pc.iceConnectionState;
             Janus.log("ICE connection state changed to from icestate method", state);
             if (state === "disconnected" || state === "failed") {
-                Janus.warn("ICE connection lost, attempting to reconnect...");
-                reconnectStream(streaming);
+                //janus.destroy();
+				janus.reconnect();
+                //reconnectStream(streaming);
             }
         },
     });
