@@ -21456,39 +21456,9 @@ var JanusComponent = function JanusComponent(_ref) {
                         setJanusInstance(null);
                     }
                 });
-
-                // **Monitor ICE Connection State Changes**
-                janus.oniceconnectionstatechange = function () {
-                    console.log("ICE Connection State Changed:", janus.iceConnectionState);
-
-                    if (janus.iceConnectionState === "disconnected" || janus.iceConnectionState === "failed") {
-                        console.warn("ICE connection lost. Restarting connection...");
-
-                        janus.destroy();
-                        setTimeout(function () {
-                            handleConnection();
-                        }, 1000);
-                    }
-                };
             }
         });
     };
-
-    // **Handle Network Changes**
-    (0, _react.useEffect)(function () {
-        var handleNetworkChange = function handleNetworkChange() {
-            console.log("Network changed. Restarting Janus...");
-            handleConnection();
-        };
-
-        window.addEventListener("online", handleNetworkChange);
-        window.addEventListener("offline", handleNetworkChange);
-
-        return function () {
-            window.removeEventListener("online", handleNetworkChange);
-            window.removeEventListener("offline", handleNetworkChange);
-        };
-    }, []);
 
     return _react2.default.createElement(
         'div',
@@ -21766,6 +21736,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             setList(data);
             (0, _streaming2.startStream)(_streaming, streamId);
         } else if (eventType == "icerestart") {
+            var body = { "request": "stop" };
+            _streaming.send({ "message": body });
             _streaming.hangup();
             setTimeout(function () {
                 (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
@@ -22418,7 +22390,7 @@ exports.JanusPlayer = _JanusPlayer2.default;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
 exports.startStream = startStream;
 exports.subscribeStreaming = subscribeStreaming;
@@ -22430,96 +22402,117 @@ var _janus2 = _interopRequireDefault(_janus);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function startStream(streaming, selectedStream) {
-    _janus2.default.log("Selected video id #" + selectedStream);
-    if (!selectedStream) return;
-    var body = { "request": "watch", id: parseInt(selectedStream) };
-    streaming.send({ "message": body });
+	_janus2.default.log("Selected video id #" + selectedStream);
+	if (selectedStream === undefined || selectedStream === null) {
+		return;
+	}
+	var body = { "request": "watch", id: parseInt(selectedStream) };
+	streaming.send({ "message": body });
+	// No remote video yet
 }
 
 function subscribeStreaming(janus, opaqueId, callback) {
-    var streaming = null;
+	var streaming = null;
 
-    janus.attach({
-        plugin: "janus.plugin.streaming",
-        opaqueId: opaqueId,
-        success: function success(pluginHandle) {
-            streaming = pluginHandle;
-            _janus2.default.log("Plugin attached! (" + streaming.getPlugin() + ", id=" + streaming.getId() + ")");
+	janus.attach({
+		plugin: "janus.plugin.streaming",
+		opaqueId: opaqueId,
+		success: function success(pluginHandle) {
+			streaming = pluginHandle;
+			_janus2.default.log("Plugin attached! (" + streaming.getPlugin() + ", id=" + streaming.getId() + ")");
+			// Setup streaming session
+			// $('#update-streams').click(updateStreamsList);
 
-            var body = { "request": "list" };
-            _janus2.default.debug("Sending message (" + JSON.stringify(body) + ")");
-            streaming.send({ "message": body, success: function success(result) {
-                    if (result.list) {
-                        _janus2.default.log("Got a list of available streams", result.list);
-                        callback(streaming, "list", result.list);
-                    }
-                } });
-        },
-        error: function error(_error) {
-            _janus2.default.error("Error attaching plugin:", _error);
-            callback(streaming, "error", _error);
-        },
-        onmessage: function onmessage(msg, jsep) {
-            _janus2.default.debug("Got a message:", msg);
-            var result = msg.result;
+			var body = { "request": "list" };
+			_janus2.default.debug("Sending message (" + JSON.stringify(body) + ")");
+			streaming.send({ "message": body, success: function success(result) {
+					if (result["list"] !== undefined && result["list"] !== null) {
+						var list = result["list"];
+						_janus2.default.log("Got a list of available streams");
+						_janus2.default.log(list);
+						for (var mp in list) {
+							_janus2.default.log("  >> [" + list[mp]["id"] + "] " + list[mp]["description"] + " (" + list[mp]["type"] + ")");
+						}
+						callback(streaming, "list", list);
+					}
+				} });
+		},
+		error: function error(_error) {
+			_janus2.default.error("  -- Error attaching plugin...", _error);
+			callback(streaming, "error", _error);
+		},
+		onmessage: function onmessage(msg, jsep) {
+			_janus2.default.debug(" ::: Got a message :::");
+			_janus2.default.debug(msg);
+			var result = msg["result"];
+			if (result !== null && result !== undefined) {
+				if (result["status"] !== undefined && result["status"] !== null) {
+					var status = result["status"];
+					if (status === 'starting') callback(streaming, "starting");else if (status === 'started') callback(streaming, "started");else if (status === 'stopped') {
+						var body = { "request": "stop" };
+						streaming.send({ "message": body });
+						streaming.hangup();
+					}
+				} else if (msg["streaming"] === "event") {
+					// Is simulcast in place?
+					var substream = result["substream"];
+					var temporal = result["temporal"];
+					if (substream !== null && substream !== undefined || temporal !== null && temporal !== undefined) {
+						// We just received notice that there's been a switch, update the buttons
+						callback(streaming, "simulcastStarted");
+					}
+					// Is VP9/SVC in place?
+					var spatial = result["spatial_layer"];
+					temporal = result["temporal_layer"];
+					if (spatial !== null && spatial !== undefined || temporal !== null && temporal !== undefined) {
+						// We just received notice that there's been a switch, update the buttons
+						callback(streaming, "svcStarted");
+					}
+				}
+			} else if (msg["error"] !== undefined && msg["error"] !== null) {
+				var body = { "request": "stop" };
+				streaming.send({ "message": body });
+				streaming.hangup();
+				return;
+			}
+			if (jsep !== undefined && jsep !== null) {
+				_janus2.default.debug("Handling SDP as well...");
+				_janus2.default.debug(jsep);
+				// Offer from the plugin, let's answer
+				streaming.createAnswer({
+					jsep: jsep,
+					media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
+					success: function success(jsep) {
+						_janus2.default.debug("Got SDP!");
+						_janus2.default.debug(jsep);
+						var body = { "request": "start" };
+						streaming.send({ "message": body, "jsep": jsep });
+					},
+					error: function error(_error2) {
+						_janus2.default.error("WebRTC error:", _error2);
+					}
+				});
+			}
+		},
+		onremotestream: function onremotestream(stream) {
+			callback(streaming, "onremotestream", stream);
+		},
+		oncleanup: function oncleanup() {
+			callback(streaming, "oncleanup");
+		},
+		onlocalstream: function onlocalstream(stream) {
+			// The subscriber stream is recvonly, we don't expect anything here
+		},
+		iceState: function iceState() {
+			var state = streaming.webrtcStuff.pc.iceConnectionState;
+			_janus2.default.log("ICE connection state changed to", state);
+			if (state === "disconnected" || state === "failed") {
+				callback(streaming, "icerestart");
+			}
+		}
 
-            if (result) {
-                if (result.status) {
-                    if (result.status === 'starting') callback(streaming, "starting");else if (result.status === 'started') callback(streaming, "started");else if (result.status === 'stopped') reconnectStream(streaming);
-                }
-            } else if (msg.error) {
-                reconnectStream(streaming);
-                return;
-            }
-
-            if (jsep) {
-                _janus2.default.debug("Handling SDP", jsep);
-                streaming.createAnswer({
-                    jsep: jsep,
-                    media: { audioSend: false, videoSend: false },
-                    success: function success(jsep) {
-                        _janus2.default.debug("Got SDP!", jsep);
-                        var body = { "request": "start" };
-                        streaming.send({ "message": body, "jsep": jsep });
-                    },
-                    error: function error(_error2) {
-                        _janus2.default.error("WebRTC error:", _error2);
-                    }
-                });
-            }
-        },
-        onremotestream: function onremotestream(stream) {
-            callback(streaming, "onremotestream", stream);
-        },
-        oncleanup: function oncleanup() {
-            callback(streaming, "oncleanup");
-        },
-        onlocalstream: function onlocalstream(stream) {
-            // The subscriber stream is recvonly, nothing is expected here
-        },
-        iceState: function iceState() {
-            var state = streaming.webrtcStuff.pc.iceConnectionState;
-            _janus2.default.log("ICE connection state changed to from icestate method", state);
-            if (state === "disconnected" || state === "failed") {
-                //janus.destroy();
-                //janus.reconnect();
-                callback(streaming, "icerestart");
-                //reconnectStream(streaming);
-            }
-        }
-    });
-    return streaming;
-}
-
-function reconnectStream(streaming) {
-    _janus2.default.log("Reconnecting stream...");
-    streaming.createOffer({
-        media: { audioRecv: false, videoRecv: true, audioSend: false, videoSend: false },
-        iceRestart: true,
-        success: function success(jsep) {
-            streaming.send({ "message": { request: "watch", id: 1 }, "jsep": jsep });
-        }
-    });
+	});
+	return streaming;
 }
 
 /***/ }),

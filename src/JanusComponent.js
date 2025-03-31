@@ -61,40 +61,10 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                         setJanusInstance(null);
                     }
                 });
-
-                // **Monitor ICE Connection State Changes**
-                janus.oniceconnectionstatechange = () => {
-                    console.log("ICE Connection State Changed:", janus.iceConnectionState);
-
-                    if (janus.iceConnectionState === "disconnected" || janus.iceConnectionState === "failed") {
-                        console.warn("ICE connection lost. Restarting connection...");
-
-                        janus.destroy();
-                        setTimeout(() => {
-                            handleConnection();
-                        }, 1000);
-                    }
-                };
             }
         });
     };
-
-    // **Handle Network Changes**
-    useEffect(() => {
-        const handleNetworkChange = () => {
-            console.log("Network changed. Restarting Janus...");
-            handleConnection();
-        };
-
-        window.addEventListener("online", handleNetworkChange);
-        window.addEventListener("offline", handleNetworkChange);
-
-        return () => {
-            window.removeEventListener("online", handleNetworkChange);
-            window.removeEventListener("offline", handleNetworkChange);
-        };
-    }, []);
-
+    
     return (
         <div className="janus-container" ref={janusEl}>
             {children && React.cloneElement(children, { janus: janusInstance, createConnection: handleConnection })}
