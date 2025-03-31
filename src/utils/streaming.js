@@ -75,7 +75,8 @@ export function subscribeStreaming(janus, opaqueId, callback) {
             Janus.log("ICE connection state changed to from icestate method", state);
             if (state === "disconnected" || state === "failed") {
                 //janus.destroy();
-				janus.reconnect();
+				//janus.reconnect();
+				callback(streaming, "icerestart");
                 //reconnectStream(streaming);
             }
         },

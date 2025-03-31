@@ -68,6 +68,11 @@ const JanusStreamer = React.forwardRef((
         } else if (eventType === "list") {
             setList(data);
             startStream(_streaming, streamId);
+        } else if(eventType == "icerestart"){
+            _streaming.hangup();
+            setTimeout(() => {
+                subscribeStreaming(janus, opaqueId, streamingCallback);
+              }, 2000);
         }
 
     }

@@ -21766,7 +21766,10 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             setList(data);
             (0, _streaming2.startStream)(_streaming, streamId);
         } else if (eventType == "icerestart") {
-            (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            _streaming.hangup();
+            setTimeout(function () {
+                (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            }, 2000);
         }
     };
     var bitrates = streaming && streaming.webrtcStuff && streaming.webrtcStuff.bitrate ? streaming.webrtcStuff.bitrate.value : janusBitrate;
@@ -22499,7 +22502,8 @@ function subscribeStreaming(janus, opaqueId, callback) {
             _janus2.default.log("ICE connection state changed to from icestate method", state);
             if (state === "disconnected" || state === "failed") {
                 //janus.destroy();
-                janus.reconnect();
+                //janus.reconnect();
+                callback(streaming, "icerestart");
                 //reconnectStream(streaming);
             }
         }
