@@ -78,23 +78,15 @@ export function subscribeStreaming(janus, opaqueId, callback) {
                 reconnectStream(streaming);
             }
         },
-        oniceconnectionstatechange: function () {
-            let state = streaming.webrtcStuff.pc.iceConnectionState;
-            Janus.log("ICE connection state changed to", state);
-            if (state === "disconnected" || state === "failed") {
-                Janus.warn("ICE connection lost, attempting to reconnect...");
-                reconnectStream(streaming);
-            }
-        }
     });
     return streaming;
 }
 
 function reconnectStream(streaming) {
     Janus.log("Reconnecting stream...");
-    streaming.hangup();
-    setTimeout(() => {
-        let body = { "request": "watch" };
-        streaming.send({ "message": body });
-    }, 1000);
+    streaming.send({
+		"message": {
+			request: "watch", id: 1, refresh: true
+		}
+	});
 }

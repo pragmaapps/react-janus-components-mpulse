@@ -22499,14 +22499,6 @@ function subscribeStreaming(janus, opaqueId, callback) {
                 _janus2.default.warn("ICE connection lost, attempting to reconnect...");
                 reconnectStream(streaming);
             }
-        },
-        oniceconnectionstatechange: function oniceconnectionstatechange() {
-            var state = streaming.webrtcStuff.pc.iceConnectionState;
-            _janus2.default.log("ICE connection state changed to", state);
-            if (state === "disconnected" || state === "failed") {
-                _janus2.default.warn("ICE connection lost, attempting to reconnect...");
-                reconnectStream(streaming);
-            }
         }
     });
     return streaming;
@@ -22514,11 +22506,11 @@ function subscribeStreaming(janus, opaqueId, callback) {
 
 function reconnectStream(streaming) {
     _janus2.default.log("Reconnecting stream...");
-    streaming.hangup();
-    setTimeout(function () {
-        var body = { "request": "watch" };
-        streaming.send({ "message": body });
-    }, 1000);
+    streaming.send({
+        "message": {
+            request: "watch", id: 1, refresh: true
+        }
+    });
 }
 
 /***/ }),
