@@ -23,7 +23,8 @@
 	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 	OTHER DEALINGS IN THE SOFTWARE.
  */
-
+	import jQuery from 'jquery';
+	import adapter from 'webrtc-adapter';
 // eslint-disable-next-line no-unused-vars
 var Janus = (function (factory) {
 	if (typeof define === 'function' && define.amd) {
