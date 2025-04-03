@@ -95,6 +95,15 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 							},
 							error: function(error) {
 								Janus.error("WebRTC error:", error);
+							},
+							// Add the onicecandidate handler
+							onicecandidate: function(event) {
+								if (event.candidate) {
+									Janus.log("New ICE candidate: ", event.candidate);
+									// You can also send the candidate to the remote peer if needed
+								} else {
+									Janus.log("All ICE candidates have been gathered.");
+								}
 							}
 						});
 				}
@@ -107,6 +116,15 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 			},
 			onlocalstream: function(stream) {
 				// The subscriber stream is recvonly, we don't expect anything here
+			},
+			oniceconnectionstatechange: function() {
+				let state = streaming.webrtcStuff.pc.iceConnectionState;
+				Janus.log("[oniceconnectionstatechange]ICE connection state changed to", state);
+				if (state === "disconnected" || state === "failed") {
+					// Attempt to reconnect or notify the user
+					Janus.log("Attempting to reconnect...");
+					// Implement reconnection logic here
+				}
 			},
 			iceState: function () {
 				let state = streaming.webrtcStuff.pc.iceConnectionState;
