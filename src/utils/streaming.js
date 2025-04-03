@@ -44,6 +44,8 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 			onmessage: function(msg, jsep) {
 				Janus.debug(" ::: Got a message :::");
 				Janus.debug(msg);
+				console.log("message of stream", msg);
+				console.log("message of stream related to ICE",  msg["ice"]);
 				var result = msg["result"];
 				if(result !== null && result !== undefined) {
 					if(result["status"] !== undefined && result["status"] !== null) {
@@ -112,12 +114,15 @@ export function subscribeStreaming(janus, opaqueId, callback) {
                 callback(streaming, "onremotestream", stream);
 			},
 			oncleanup: function() {
+				console.log("[cleanup]: we are in cleaup");
 				callback(streaming, "oncleanup");				
 			},
 			onlocalstream: function(stream) {
+				console.log("[onlocalstream]: we are in onlocalstream" );
 				// The subscriber stream is recvonly, we don't expect anything here
 			},
 			oniceconnectionstatechange: function() {
+				console.log("[oniceconnectionstatechange]: we are in oniceconnectionstatechange" );
 				let state = streaming.webrtcStuff.pc.iceConnectionState;
 				Janus.log("[oniceconnectionstatechange]ICE connection state changed to", state);
 				if (state === "disconnected" || state === "failed") {
@@ -126,11 +131,22 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 					// Implement reconnection logic here
 				}
 			},
-			iceState: function () {
+			webrtcState: function (isConnected) {
+				console.log("WebRTC state changed:", isConnected);
+				if (!isConnected) {
+				  console.warn("WebRTC lost connection! Attempting recovery...");
+				  // Implement reconnection logic here
+				}
+			},
+			mediaState: function (type, othertype) {
+				console.log("mediaState :", type, othertype);
+			},
+			iceState: function (conntionState) {
+				console.log("[ice State] state of IEC",conntionState );
 				let state = streaming.webrtcStuff.pc.iceConnectionState;
 				Janus.log("ICE connection state changed to", state);
 				if (state === "disconnected" || state === "failed") {
-					callback(streaming, "icerestart");
+					//callback(streaming, "icerestart");
 				}
 	 		}
 
