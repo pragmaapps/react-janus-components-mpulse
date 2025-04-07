@@ -92,7 +92,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 								Janus.debug(jsep);
 								var body = { "request": "start" };
 								streaming.send({"message": body, "jsep": jsep});
-								/*const pc = streaming.webrtcStuff.pc;
+								const pc = streaming.webrtcStuff.pc;
 								console.log("Initial ICE state from creat answer method:", pc.iceConnectionState);
 
 								pc.oniceconnectionstatechange = () => {
@@ -102,7 +102,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 									console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
 									// You can trigger recovery/reconnect logic here
 								}
-								};*/
+								};
 							},
 							error: function(error) {
 								Janus.error("WebRTC error:", error);
