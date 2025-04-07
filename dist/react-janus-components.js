@@ -22444,8 +22444,6 @@ function subscribeStreaming(janus, opaqueId, callback) {
 		onmessage: function onmessage(msg, jsep) {
 			_janus2.default.debug(" ::: Got a message :::");
 			_janus2.default.debug(msg);
-			console.log("message of stream", msg);
-			console.log("message of stream related to ICE", msg["ice"]);
 			var result = msg["result"];
 			if (result !== null && result !== undefined) {
 				if (result["status"] !== undefined && result["status"] !== null) {
@@ -22503,15 +22501,6 @@ function subscribeStreaming(janus, opaqueId, callback) {
 					},
 					error: function error(_error2) {
 						_janus2.default.error("WebRTC error:", _error2);
-					},
-					// Add the onicecandidate handler
-					onicecandidate: function onicecandidate(event) {
-						if (event.candidate) {
-							_janus2.default.log("New ICE candidate: ", event.candidate);
-							// You can also send the candidate to the remote peer if needed
-						} else {
-							_janus2.default.log("All ICE candidates have been gathered.");
-						}
 					}
 				});
 			}
@@ -22520,22 +22509,10 @@ function subscribeStreaming(janus, opaqueId, callback) {
 			callback(streaming, "onremotestream", stream);
 		},
 		oncleanup: function oncleanup() {
-			console.log("[cleanup]: we are in cleaup");
 			callback(streaming, "oncleanup");
 		},
 		onlocalstream: function onlocalstream(stream) {
-			console.log("[onlocalstream]: we are in onlocalstream");
 			// The subscriber stream is recvonly, we don't expect anything here
-		},
-		oniceconnectionstatechange: function oniceconnectionstatechange() {
-			console.log("[oniceconnectionstatechange]: we are in oniceconnectionstatechange");
-			var state = streaming.webrtcStuff.pc.iceConnectionState;
-			_janus2.default.log("[oniceconnectionstatechange]ICE connection state changed to", state);
-			if (state === "disconnected" || state === "failed") {
-				// Attempt to reconnect or notify the user
-				_janus2.default.log("Attempting to reconnect...");
-				// Implement reconnection logic here
-			}
 		},
 		webrtcState: function webrtcState(isConnected) {
 			console.log("WebRTC state changed:", isConnected);
@@ -22544,11 +22521,7 @@ function subscribeStreaming(janus, opaqueId, callback) {
 				// Implement reconnection logic here
 			}
 		},
-		mediaState: function mediaState(type, othertype) {
-			console.log("mediaState :", type, othertype);
-		},
-		iceState: function iceState(conntionState) {
-			console.log("[ice State] state of IEC", conntionState);
+		iceState: function iceState() {
 			var state = streaming.webrtcStuff.pc.iceConnectionState;
 			_janus2.default.log("ICE connection state changed to", state);
 			if (state === "disconnected" || state === "failed") {
