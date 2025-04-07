@@ -22487,17 +22487,15 @@ function subscribeStreaming(janus, opaqueId, callback) {
 						_janus2.default.debug(jsep);
 						var body = { "request": "start" };
 						streaming.send({ "message": body, "jsep": jsep });
-						var pc = streaming.webrtcStuff.pc;
-						console.log("Initial ICE state from creat answer method:", pc.iceConnectionState);
-
-						pc.oniceconnectionstatechange = function () {
-							console.log("ICE connection state from create answer method:", pc.iceConnectionState);
-
-							if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
-								console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
-								// You can trigger recovery/reconnect logic here
-							}
-						};
+						/*const pc = streaming.webrtcStuff.pc;
+      console.log("Initial ICE state from creat answer method:", pc.iceConnectionState);
+      	pc.oniceconnectionstatechange = () => {
+      console.log("ICE connection state from create answer method:", pc.iceConnectionState);
+      	if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
+      	console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
+      	// You can trigger recovery/reconnect logic here
+      }
+      };*/
 					},
 					error: function error(_error2) {
 						_janus2.default.error("WebRTC error:", _error2);
@@ -22514,18 +22512,18 @@ function subscribeStreaming(janus, opaqueId, callback) {
 		onlocalstream: function onlocalstream(stream) {
 			// The subscriber stream is recvonly, we don't expect anything here
 		},
+		iceState: function iceState() {
+			var state = streaming.webrtcStuff.pc.iceConnectionState;
+			console.log("ICE connection state changed to", state);
+			if (state === "disconnected" || state === "failed") {
+				//callback(streaming, "icerestart");
+			}
+		},
 		webrtcState: function webrtcState(isConnected) {
 			console.log("WebRTC state changed:", isConnected);
 			if (!isConnected) {
 				console.warn("WebRTC lost connection! Attempting recovery...");
 				// Implement reconnection logic here
-			}
-		},
-		iceState: function iceState() {
-			var state = streaming.webrtcStuff.pc.iceConnectionState;
-			_janus2.default.log("ICE connection state changed to", state);
-			if (state === "disconnected" || state === "failed") {
-				//callback(streaming, "icerestart");
 			}
 		}
 
