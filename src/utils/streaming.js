@@ -123,7 +123,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 				let state = streaming.webrtcStuff.pc.iceConnectionState;
 				console.log("ICE connection state changed to", state);
 				if (state === "disconnected" || state === "failed") {
-					//callback(streaming, "icerestart");
+					callback(streaming, "icerestart");
 				}
 	 		},
 			webrtcState: function (isConnected) {
