@@ -92,17 +92,17 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 								Janus.debug(jsep);
 								var body = { "request": "start" };
 								streaming.send({"message": body, "jsep": jsep});
-								const pc = streaming.webrtcStuff.pc;
+								/*const pc = streaming.webrtcStuff.pc;
 								console.log("Initial ICE state from creat answer method:", pc.iceConnectionState);
 
 								pc.oniceconnectionstatechange = () => {
-								console.log("ICE connection state from create answer method:", pc.iceConnectionState);
+									console.log("ICE connection state from create answer method:", pc.iceConnectionState);
 
-								if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
-									console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
-									// You can trigger recovery/reconnect logic here
-								}
-								};
+									if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
+										console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
+										// You can trigger recovery/reconnect logic here
+									}
+								};*/
 							},
 							error: function(error) {
 								Janus.error("WebRTC error:", error);
@@ -123,7 +123,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 				let state = streaming.webrtcStuff.pc.iceConnectionState;
 				console.log("ICE connection state changed to", state);
 				if (state === "disconnected" || state === "failed") {
-					callback(streaming, "icerestart");
+					//callback(streaming, "icerestart");
 				}
 	 		},
 			webrtcState: function (isConnected) {

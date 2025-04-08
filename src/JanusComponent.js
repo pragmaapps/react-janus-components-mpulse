@@ -36,8 +36,8 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                         credential: "januspwd"
                     });
                 } else {
-                    console.log("No TURN server; using default STUN");
-                    iceServers.push({ urls: "stun:stun.l.google.com:19302" });
+                    console.log("No TURN server; using none");
+                    //iceServers.push({ urls: "stun:stun.l.google.com:19302" });
                 }
 
                 let connectionIP = window.location.hostname;
@@ -46,7 +46,7 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                 const janus = new Janus({
                     server: `http://${connectionIP}:8088/janus`,
                     iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
+                    iceTransportPolicy: turnServerStatus ? "relay" : "relay",
 
                     success: function () {
                         console.log("Janus loaded successfully on", connectionIP);
