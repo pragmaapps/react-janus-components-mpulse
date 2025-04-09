@@ -44,17 +44,17 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                 console.log("Establishing Janus connection using IP:", connectionIP);
 
                 // Check if the connection is being made on localhost
-                let iceTransportPolicy = turnServerStatus ? "relay" : "all"; // Default policy
+                /*let iceTransportPolicy = turnServerStatus ? "relay" : "all"; // Default policy
                 if (connectionIP === '127.0.0.1' || connectionIP === 'localhost') {
                     console.log("Running on localhost; skipping remote connection.");
                     iceServers = []; // Clear iceServers to prevent remote connections
                     iceTransportPolicy = "none"; // Disable ICE candidate gathering
-                }
+                }*/
 
                 const janus = new Janus({
                     server: `http://${connectionIP}:8088/janus`,
                     iceServers: iceServers,
-                    iceTransportPolicy: iceTransportPolicy,
+                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
 
                     success: function () {
                         console.log("Janus loaded successfully on", connectionIP);

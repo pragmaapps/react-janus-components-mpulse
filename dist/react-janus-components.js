@@ -21439,17 +21439,17 @@ var JanusComponent = function JanusComponent(_ref) {
                 console.log("Establishing Janus connection using IP:", connectionIP);
 
                 // Check if the connection is being made on localhost
-                var iceTransportPolicy = turnServerStatus ? "relay" : "all"; // Default policy
+                /*let iceTransportPolicy = turnServerStatus ? "relay" : "all"; // Default policy
                 if (connectionIP === '127.0.0.1' || connectionIP === 'localhost') {
                     console.log("Running on localhost; skipping remote connection.");
                     iceServers = []; // Clear iceServers to prevent remote connections
                     iceTransportPolicy = "none"; // Disable ICE candidate gathering
-                }
+                }*/
 
                 var janus = new _janus2.default({
                     server: 'http://' + connectionIP + ':8088/janus',
                     iceServers: iceServers,
-                    iceTransportPolicy: iceTransportPolicy,
+                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
 
                     success: function success() {
                         console.log("Janus loaded successfully on", connectionIP);
