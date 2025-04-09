@@ -21449,7 +21449,7 @@ var JanusComponent = function JanusComponent(_ref) {
                 var janus = new _janus2.default({
                     server: 'http://' + connectionIP + ':8088/janus',
                     iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "relay",
+                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
 
                     success: function success() {
                         console.log("Janus loaded successfully on", connectionIP);

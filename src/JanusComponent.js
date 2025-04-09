@@ -54,7 +54,7 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                 const janus = new Janus({
                     server: `http://${connectionIP}:8088/janus`,
                     iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "relay",
+                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
 
                     success: function () {
                         console.log("Janus loaded successfully on", connectionIP);
