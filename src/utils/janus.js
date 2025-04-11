@@ -1878,6 +1878,7 @@
 							sendTrickleCandidate(handleId, candidate);
 						}*/
 						var candStr = event.candidate.candidate;
+						console.log("candidate we got:", candStr);
 						if (config.trickle === true) {
 							// Only allow 127.0.0.1 candidates
 							if (candStr.includes("127.0.0.1")) {
