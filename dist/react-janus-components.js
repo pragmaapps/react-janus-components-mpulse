@@ -21433,11 +21433,11 @@ var JanusComponent = function JanusComponent(_ref) {
                 } else {
                     console.log("No TURN server; using stun");
                     //iceServers.push({ urls: "stun:stun.l.google.com:19302" });
-                    iceServers.push({
+                    /*iceServers.push({
                         urls: "turn:127.0.0.1:3478",
                         username: "janus",
                         credential: "januspass"
-                    });
+                      });*/
                 }
 
                 var connectionIP = window.location.hostname;
@@ -21454,7 +21454,7 @@ var JanusComponent = function JanusComponent(_ref) {
                 var janus = new _janus2.default({
                     server: 'http://' + connectionIP + ':8088/janus',
                     iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "relay",
+                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
 
                     success: function success() {
                         console.log("Janus loaded successfully on", connectionIP);
@@ -22494,8 +22494,9 @@ function subscribeStreaming(janus, opaqueId, callback) {
 				// Offer from the plugin, let's answer
 				streaming.createAnswer({
 					jsep: jsep,
-					trickle: false,
-					media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
+					media: { audioSend: false, videoSend: false, replaceVideo: true }, // We want recvonly audio/video
+					simulcast: false,
+					simulcast2: false,
 					success: function success(jsep) {
 						_janus2.default.debug("Got SDP!");
 						_janus2.default.debug(jsep);
