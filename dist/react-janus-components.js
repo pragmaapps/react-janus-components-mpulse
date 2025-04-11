@@ -21433,6 +21433,11 @@ var JanusComponent = function JanusComponent(_ref) {
                 } else {
                     console.log("No TURN server; using stun");
                     //iceServers.push({ urls: "stun:stun.l.google.com:19302" });
+                    iceServers.push({
+                        urls: "turn:127.0.0.1:3478",
+                        username: "janus",
+                        credential: "januspass"
+                    });
                 }
 
                 var connectionIP = window.location.hostname;
@@ -21449,7 +21454,7 @@ var JanusComponent = function JanusComponent(_ref) {
                 var janus = new _janus2.default({
                     server: 'http://' + connectionIP + ':8088/janus',
                     iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
+                    iceTransportPolicy: turnServerStatus ? "relay" : "relay",
 
                     success: function success() {
                         console.log("Janus loaded successfully on", connectionIP);
