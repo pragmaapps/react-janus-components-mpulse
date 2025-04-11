@@ -2526,29 +2526,14 @@ function Janus(gatewayCallbacks) {
 				} else {
 					// JSON.stringify doesn't work on some WebRTC objects anymore
 					// See https://code.google.com/p/chromium/issues/detail?id=467366
-					/*var candidate = {
-     	"candidate": event.candidate.candidate,
-     	"sdpMid": event.candidate.sdpMid,
-     	"sdpMLineIndex": event.candidate.sdpMLineIndex
-     };
-     if(config.trickle === true) {
-     	// Send candidate
-     	sendTrickleCandidate(handleId, candidate);
-     }*/
-					var candStr = event.candidate.candidate;
-					console.log("candidate we got:", candStr);
+					var candidate = {
+						"candidate": event.candidate.candidate,
+						"sdpMid": event.candidate.sdpMid,
+						"sdpMLineIndex": event.candidate.sdpMLineIndex
+					};
 					if (config.trickle === true) {
-						// Only allow 127.0.0.1 candidates
-						if (candStr.includes("127.0.0.1")) {
-							var candidate = {
-								"candidate": candStr,
-								"sdpMid": event.candidate.sdpMid,
-								"sdpMLineIndex": event.candidate.sdpMLineIndex
-							};
-							sendTrickleCandidate(handleId, candidate);
-						} else {
-							Janus.log("Ignoring non-loopback candidate: " + candStr);
-						}
+						// Send candidate
+						sendTrickleCandidate(handleId, candidate);
 					}
 				}
 			};
@@ -21447,7 +21432,7 @@ var JanusComponent = function JanusComponent(_ref) {
                     });
                 } else {
                     console.log("No TURN server; using stun");
-                    iceServers.push({ urls: "stun:stun.l.google.com:19302" });
+                    //iceServers.push({ urls: "stun:stun.l.google.com:19302" });
                 }
 
                 var connectionIP = window.location.hostname;
@@ -22504,7 +22489,7 @@ function subscribeStreaming(janus, opaqueId, callback) {
 				// Offer from the plugin, let's answer
 				streaming.createAnswer({
 					jsep: jsep,
-					//trickle: false,
+					trickle: false,
 					media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
 					success: function success(jsep) {
 						_janus2.default.debug("Got SDP!");

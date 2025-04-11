@@ -86,7 +86,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 					streaming.createAnswer(
 						{
 							jsep: jsep,
-							//trickle: false,
+							trickle: false,
 							media: { audioSend: false, videoSend: false },	// We want recvonly audio/video
 							success: function(jsep) {
 								Janus.debug("Got SDP!");

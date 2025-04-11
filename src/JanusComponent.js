@@ -37,7 +37,7 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                     });
                 } else {
                     console.log("No TURN server; using stun");
-                    iceServers.push({ urls: "stun:stun.l.google.com:19302" });
+                    //iceServers.push({ urls: "stun:stun.l.google.com:19302" });
                 }
 
                 let connectionIP = window.location.hostname;
