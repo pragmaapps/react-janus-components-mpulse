@@ -1868,7 +1868,7 @@
 					} else {
 						// JSON.stringify doesn't work on some WebRTC objects anymore
 						// See https://code.google.com/p/chromium/issues/detail?id=467366
-						var candidate = {
+						/*var candidate = {
 							"candidate": event.candidate.candidate,
 							"sdpMid": event.candidate.sdpMid,
 							"sdpMLineIndex": event.candidate.sdpMLineIndex
@@ -1876,6 +1876,20 @@
 						if(config.trickle === true) {
 							// Send candidate
 							sendTrickleCandidate(handleId, candidate);
+						}*/
+						var candStr = event.candidate.candidate;
+						if (config.trickle === true) {
+							// Only allow 127.0.0.1 candidates
+							if (candStr.includes("127.0.0.1")) {
+								var candidate = {
+								"candidate": candStr,
+								"sdpMid": event.candidate.sdpMid,
+								"sdpMLineIndex": event.candidate.sdpMLineIndex
+								};
+								sendTrickleCandidate(handleId, candidate);
+							} else {
+								Janus.log("Ignoring non-loopback candidate: " + candStr);
+							}
 						}
 					}
 				};
