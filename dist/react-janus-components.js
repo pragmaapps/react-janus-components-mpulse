@@ -22538,6 +22538,10 @@ function subscribeStreaming(janus, opaqueId, callback) {
 			console.warn("Streaming plugin not ready for ICE restart.");
 			return;
 		}
+
+		console.log("Pausing stream before ICE restart...");
+		streaming.send({ message: { request: "pause" } });
+
 		streaming.createOffer({
 			media: { audioSend: false, videoSend: false },
 			iceRestart: true,
