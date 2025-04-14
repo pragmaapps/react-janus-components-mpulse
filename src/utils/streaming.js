@@ -11,21 +11,20 @@ export function startStream(streaming, selectedStream) {
 }
 
 export function subscribeStreaming(janus, opaqueId, callback) {
-    let streaming = null;
+	let streaming = null;
 
-    janus.attach(
-		{
-			plugin: "janus.plugin.streaming",
-			opaqueId: opaqueId,
-			success: function(pluginHandle) {
-				streaming = pluginHandle;
-				Janus.log("Plugin attached! (" + streaming.getPlugin() + ", id=" + streaming.getId() + ")");
-				// Setup streaming session
-				// $('#update-streams').click(updateStreamsList);
+	janus.attach({
+		plugin: "janus.plugin.streaming",
+		opaqueId: opaqueId,
+		success: function(pluginHandle) {
+			streaming = pluginHandle;
+			Janus.log("Plugin attached! (" + streaming.getPlugin() + ", id=" + streaming.getId() + ")");
 
-				var body = { "request": "list" };
-				Janus.debug("Sending message (" + JSON.stringify(body) + ")");
-				streaming.send({"message": body, success: function(result) {
+			var body = { "request": "list" };
+			Janus.debug("Sending message (" + JSON.stringify(body) + ")");
+			streaming.send({
+				"message": body,
+				success: function(result) {
 					if(result["list"] !== undefined && result["list"] !== null) {
 						var list = result["list"];
 						Janus.log("Got a list of available streams");
@@ -35,107 +34,134 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 						}
 						callback(streaming, "list", list);
 					}
-				}});
+				}
+			});
+		},
+		error: function(error) {
+			Janus.error("  -- Error attaching plugin...", error);
+			callback(streaming, "error", error);
+		},
+		onmessage: function(msg, jsep) {
+			Janus.debug(" ::: Got a message :::");
+			Janus.debug(msg);
+			var result = msg["result"];
+			if(result !== null && result !== undefined) {
+				if(result["status"] !== undefined && result["status"] !== null) {
+					var status = result["status"];
+					if(status === 'starting')
+						callback(streaming, "starting");
+					else if(status === 'started')
+						callback(streaming, "started");
+					else if(status === 'stopped') {
+						var body = { "request": "stop" };
+						streaming.send({"message": body});
+						streaming.hangup();							
+					}
+				} else if(msg["streaming"] === "event") {
+					var substream = result["substream"];
+					var temporal = result["temporal"];
+					if((substream !== null && substream !== undefined) || (temporal !== null && temporal !== undefined)) {
+						callback(streaming, "simulcastStarted");
+					}
+					var spatial = result["spatial_layer"];
+					temporal = result["temporal_layer"];
+					if((spatial !== null && spatial !== undefined) || (temporal !== null && temporal !== undefined)) {
+						callback(streaming, "svcStarted");
+					}
+				}
+			} else if(msg["error"] !== undefined && msg["error"] !== null) {
+				var body = { "request": "stop" };
+				streaming.send({"message": body});
+				streaming.hangup();							
+				return;
+			}
+			if(jsep !== undefined && jsep !== null) {
+				Janus.debug("Handling SDP as well...");
+				Janus.debug(jsep);
+				streaming.createAnswer({
+					jsep: jsep,
+					media: { audioSend: false, videoSend: false, replaceVideo: true },
+					simulcast: false,
+					simulcast2: false,
+					success: function(jsep) {
+						Janus.debug("Got SDP!");
+						Janus.debug(jsep);
+						var body = { "request": "start" };
+						streaming.send({"message": body, "jsep": jsep});
+					},
+					error: function(error) {
+						Janus.error("WebRTC error:", error);
+					}
+				});
+			}
+		},
+		onremotestream: function(stream) {
+			callback(streaming, "onremotestream", stream);
+		},
+		oncleanup: function() {
+			callback(streaming, "oncleanup");
+		},
+		onlocalstream: function(stream) {
+			// The subscriber stream is recvonly, we don't expect anything here
+		},
+		iceState: function () {
+			let state = streaming.webrtcStuff.pc.iceConnectionState;
+			console.log("ICE connection state changed to", state);
+			if (state === "disconnected" || state === "failed") {
+				console.warn("ICE disconnected or failed — triggering ICE restart...");
+				triggerIceRestart();
+			}
+		},
+		webrtcState: function (isConnected) {
+			console.log("WebRTC state changed:", isConnected);
+			if (isConnected) {
+				startIceMonitor();
+			} else {
+				stopIceMonitor();
+			}
+		}
+	});
+
+	// ✅ ICE Restart Logic
+	function triggerIceRestart() {
+		if (!streaming) {
+			console.warn("Streaming plugin not ready for ICE restart.");
+			return;
+		}
+		streaming.createOffer({
+			media: { audioSend: false, videoSend: false },
+			iceRestart: true,
+			success: function(jsep) {
+				Janus.log("Sending ICE restart offer...");
+				var body = { "request": "start" };
+				streaming.send({ "message": body, "jsep": jsep });
 			},
 			error: function(error) {
-                Janus.error("  -- Error attaching plugin...", error);
-                callback(streaming, "error", error);
-			},		
-			onmessage: function(msg, jsep) {
-				Janus.debug(" ::: Got a message :::");
-				Janus.debug(msg);
-				var result = msg["result"];
-				if(result !== null && result !== undefined) {
-					if(result["status"] !== undefined && result["status"] !== null) {
-						var status = result["status"];
-						if(status === 'starting')
-							callback(streaming, "starting");
-						else if(status === 'started')
-							callback(streaming, "started");
-						else if(status === 'stopped') {
-							var body = { "request": "stop" };
-							streaming.send({"message": body});
-							streaming.hangup();							
-						}
-					} else if(msg["streaming"] === "event") {
-						// Is simulcast in place?
-						var substream = result["substream"];
-						var temporal = result["temporal"];
-						if((substream !== null && substream !== undefined) || (temporal !== null && temporal !== undefined)) {
-							// We just received notice that there's been a switch, update the buttons
-							callback(streaming, "simulcastStarted");
-						}
-						// Is VP9/SVC in place?
-						var spatial = result["spatial_layer"];
-						temporal = result["temporal_layer"];
-						if((spatial !== null && spatial !== undefined) || (temporal !== null && temporal !== undefined)) {
-							// We just received notice that there's been a switch, update the buttons
-							callback(streaming, "svcStarted");
-						}
-					}
-				} else if(msg["error"] !== undefined && msg["error"] !== null) {
-					var body = { "request": "stop" };
-					streaming.send({"message": body});
-					streaming.hangup();							
-					return;
-				}
-				if(jsep !== undefined && jsep !== null) {
-					Janus.debug("Handling SDP as well...");
-					Janus.debug(jsep);
-					// Offer from the plugin, let's answer
-					streaming.createAnswer(
-						{
-							jsep: jsep,
-							media: { audioSend: false, videoSend: false, replaceVideo: true, },	// We want recvonly audio/video
-							simulcast: false,
-                            simulcast2: false,
-							success: function(jsep) {
-								Janus.debug("Got SDP!");
-								Janus.debug(jsep);
-								var body = { "request": "start" };
-								streaming.send({"message": body, "jsep": jsep});
-								/*const pc = streaming.webrtcStuff.pc;
-								console.log("Initial ICE state from creat answer method:", pc.iceConnectionState);
-
-								pc.oniceconnectionstatechange = () => {
-									console.log("ICE connection state from create answer method:", pc.iceConnectionState);
-
-									if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
-										console.warn("ICE connection lost from creat answer method:! Reconnect or alert the user.");
-										// You can trigger recovery/reconnect logic here
-									}
-								};*/
-							},
-							error: function(error) {
-								Janus.error("WebRTC error:", error);
-							}
-						});
-				}
-			},
-			onremotestream: function(stream) {
-                callback(streaming, "onremotestream", stream);
-			},
-			oncleanup: function() {
-				callback(streaming, "oncleanup");				
-			},
-			onlocalstream: function(stream) {
-				// The subscriber stream is recvonly, we don't expect anything here
-			},
-			iceState: function () {
-				let state = streaming.webrtcStuff.pc.iceConnectionState;
-				console.log("ICE connection state changed to", state);
-				if (state === "disconnected" || state === "failed") {
-					//callback(streaming, "icerestart");
-				}
-	 		},
-			webrtcState: function (isConnected) {
-				console.log("WebRTC state changed:", isConnected);
-				if (!isConnected) {
-				  console.warn("WebRTC lost connection! Attempting recovery...");
-				  // Implement reconnection logic here
-				}
+				Janus.error("Failed to create ICE restart offer:", error);
 			}
+		});
+	}
 
-        });
-    return streaming;
+	// ✅ ICE Polling Monitor
+	let iceMonitorInterval;
+
+	function startIceMonitor() {
+		if (iceMonitorInterval) return;
+		iceMonitorInterval = setInterval(() => {
+			if (!streaming || !streaming.webrtcStuff || !streaming.webrtcStuff.pc) return;
+			let state = streaming.webrtcStuff.pc.iceConnectionState;
+			console.log("Polling ICE connection state:", state);
+			if (state === "disconnected" || state === "failed") {
+				console.warn("Detected ICE failure via polling, triggering restart...");
+				triggerIceRestart();
+			}
+		}, 5000);
+	}
+
+	function stopIceMonitor() {
+		clearInterval(iceMonitorInterval);
+		iceMonitorInterval = null;
+	}
+
+	return streaming;
 }
