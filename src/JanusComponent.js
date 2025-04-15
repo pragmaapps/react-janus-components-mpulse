@@ -19,6 +19,7 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
     const handleConnection = () => {
         Janus.init({
             debug: "all",
+            keepalive:true,
             callback: function () {
                 if (!Janus.isWebrtcSupported()) {
                     console.log("No WebRTC support...");

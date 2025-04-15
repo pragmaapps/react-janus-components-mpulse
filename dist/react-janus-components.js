@@ -21414,6 +21414,7 @@ var JanusComponent = function JanusComponent(_ref) {
     var handleConnection = function handleConnection() {
         _janus2.default.init({
             debug: "all",
+            keepalive: true,
             callback: function callback() {
                 if (!_janus2.default.isWebrtcSupported()) {
                     console.log("No WebRTC support...");
