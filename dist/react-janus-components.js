@@ -22538,20 +22538,9 @@ function subscribeStreaming(janus, opaqueId, callback) {
 			console.warn("Streaming plugin not ready for ICE restart.");
 			return;
 		}
-
-		console.log("Pausing stream before ICE restart...");
-		streaming.send({ message: { request: "pause" } });
-
-		streaming.createOffer({
-			media: { audioSend: false, videoSend: false },
-			iceRestart: true,
-			success: function success(jsep) {
-				_janus2.default.log("Sending ICE restart offer...");
-				var body = { "request": "start" };
-				streaming.send({ "message": body, "jsep": jsep });
-			},
-			error: function error(_error3) {
-				_janus2.default.error("Failed to create ICE restart offer:", _error3);
+		streaming.send({
+			"message": {
+				request: "watch", id: 1, refresh: true
 			}
 		});
 	}
