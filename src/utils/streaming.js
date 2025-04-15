@@ -128,11 +128,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 			console.warn("Streaming plugin not ready for ICE restart.");
 			return;
 		}
-		streaming.send({
-			"message": {
-				request: "watch", id: 1, refresh: true
-			}
-		});
+		callback(streaming, "icerestart");
 	}
 
 	// ✅ ICE Polling Monitor
