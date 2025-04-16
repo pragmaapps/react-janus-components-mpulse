@@ -21516,6 +21516,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         setJanusBitrate = _useState8[1];
 
     var mystream = null;
+    var streamAttached = false;
+    var streamInterval = null;
 
     (0, _react.useEffect)(function () {
         var unmounted = false;
@@ -21525,6 +21527,9 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
 
         if (!unmounted) {
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            streamInterval = setInterval(function () {
+                (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            }, 2000);
         }
         return function () {
             unmounted = true;
@@ -21557,6 +21562,9 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             if (videoTracks === null || videoTracks === undefined || videoTracks.length === 0) {
                 setPlayerState("Error");
             }
+            streamAttached = true;
+            clearInterval(streamInterval);
+            streamInterval = null;
             console.log("[Attached video stream bitrate :]", _streaming.getBitrate());
             setJanusBitrate(_streaming.getBitrate());
         } else if (eventType === "oncleanup") {
