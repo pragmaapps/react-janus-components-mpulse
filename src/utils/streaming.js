@@ -107,14 +107,7 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 			},
 			onlocalstream: function(stream) {
 				// The subscriber stream is recvonly, we don't expect anything here
-			},
-			iceState: function () {
-				let state = streaming.webrtcStuff.pc.iceConnectionState;
-				Janus.log("ICE connection state changed to", state);
-				if (state === "disconnected" || state === "failed") {
-					callback(streaming, "icerestart");
-				}
-	 		}
+			}
 
         });
     return streaming;
