@@ -16,6 +16,8 @@ const JanusStreamer = React.forwardRef((
     const [janusBitrate, setJanusBitrate] = useState(null);
 
     let mystream = null;
+    let streamAttached = false;
+    let streamInterval = null
 
     useEffect(() => {
         let unmounted = false;
@@ -25,6 +27,9 @@ const JanusStreamer = React.forwardRef((
 
         if (!unmounted) {
             subscribeStreaming(janus, opaqueId, streamingCallback);
+            streamInterval = setInterval(() => {
+                subscribeStreaming(janus, opaqueId, streamingCallback);
+            }, 2000);
         }
         return () => {
             unmounted = true;
@@ -59,6 +64,9 @@ const JanusStreamer = React.forwardRef((
             if (videoTracks === null || videoTracks === undefined || videoTracks.length === 0) {
                 setPlayerState("Error");
             }
+            streamAttached = true;
+            clearInterval(streamInterval);
+            streamInterval = null;
             console.log("[Attached video stream bitrate :]", _streaming.getBitrate());
             setJanusBitrate(_streaming.getBitrate())
         } else if (eventType === "oncleanup") {
