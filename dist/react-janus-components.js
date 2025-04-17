@@ -21206,6 +21206,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _react = __webpack_require__(1);
@@ -21232,61 +21234,59 @@ var JanusComponent = function JanusComponent(_ref) {
         setJanusInstance = _useState2[1];
 
     (0, _react.useEffect)(function () {
+        // let unmounted = false;
         handleConnection();
 
         return function () {
-            if (janusInstance) {
-                janusInstance.destroy();
-            }
+            // unmounted = true;
             setJanusInstance(null);
         };
     }, []);
 
     var handleConnection = function handleConnection() {
         _janus2.default.init({
-            debug: "all",
-            callback: function callback() {
+            debug: "all", callback: function callback() {
                 if (!_janus2.default.isWebrtcSupported()) {
-                    console.log("No WebRTC support...");
+                    console.log("No WebRTC support... ");
                     return;
                 }
 
-                var iceServers = [];
+                var turnServer = {};
                 var turnServerStatus = isTurnServerEnabled;
-
                 if (turnServerStatus) {
-                    console.log("Using TURN server at:", 'turn:' + daqIP + ':3478');
-                    iceServers.push({
-                        urls: 'turn:' + daqIP + ':3478',
-                        username: "janususer",
-                        credential: "januspwd"
-                    });
-                } else {
-                    console.log("No TURN server; using default STUN");
-                    iceServers.push({ urls: "stun:stun.l.google.com:19302" });
+                    console.log("inside session turn server");
+                    console.log("turn:" + daqIP + ":3478", 'url');
+                    turnServer.iceServers = [{ url: "turn:" + daqIP + ":3478", username: "janususer", credential: "januspwd" }];
+                    turnServer.iceTransportPolicy = 'relay';
                 }
 
-                var connectionIP = window.location.hostname;
-                console.log("Establishing Janus connection using IP:", connectionIP);
+                var janus = new _janus2.default(_extends({
+                    server: server,
 
-                var janus = new _janus2.default({
-                    server: 'http://' + connectionIP + ':8088/janus',
-                    iceServers: iceServers,
-                    iceTransportPolicy: turnServerStatus ? "relay" : "all",
-
+                    // No "iceServers" is provided, meaning janus.js will use a default STUN server
+                    // Here are some examples of how an iceServers field may look like to support TURN
+                    // 		iceServers: [{urls: "turn:yourturnserver.com:3478", username: "janususer", credential: "januspwd"}],
+                    // 		iceServers: [{urls: "turn:yourturnserver.com:443?transport=tcp", username: "janususer", credential: "januspwd"}],
+                    // 		iceServers: [{urls: "turns:yourturnserver.com:443?transport=tcp", username: "janususer", credential: "januspwd"}],
+                    // Should the Janus API require authentication, you can specify either the API secret or user token here too
+                    //		token: "mytoken",
+                    //	or
+                    //		apisecret: "serversecret",
                     success: function success() {
-                        console.log("Janus loaded successfully on", connectionIP);
+                        // Attach to echo test plugin
+                        console.log("Janus loaded");
+                        // if (!unmounted) {
                         setJanusInstance(janus);
+                        // }
                     },
                     error: function error(_error) {
-                        console.error("Janus connection error:", _error);
+                        _janus2.default.error(_error);
                         setJanusInstance(null);
                     },
                     destroyed: function destroyed() {
-                        console.log("Janus connection destroyed.");
                         setJanusInstance(null);
                     }
-                });
+                }, turnServer));
             }
         });
     };
