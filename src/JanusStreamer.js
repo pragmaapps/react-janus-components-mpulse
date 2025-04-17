@@ -7,13 +7,14 @@ import { Video } from 'video-react';
 
 const JanusStreamer = React.forwardRef((
     {
-        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate,playPauseButton, streamIsLive
+        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate,playPauseButton, streamIsLive, networkStatus, isRecordPreviewActive
     }, ref) => {
     const videoArea = ref;
     const [playerState, setPlayerState] = useState("Ready");
     const [streaming, setStreaming] = useState(null);
     const [list, setList] = useState(null);
     const [janusBitrate, setJanusBitrate] = useState(null);
+    const reconnectInitiated = useRef(false);
 
     let mystream = null;
     let streamAttached = false;
@@ -35,6 +36,26 @@ const JanusStreamer = React.forwardRef((
             unmounted = true;
         };
     }, [janus])
+
+    useEffect(() => {
+        if (networkStatus === "down" && !reconnectInitiated.current && streaming) {
+            reconnectInitiated.current = true;
+            console.log("[JanusStreamer] Network down detected. Restarting stream...");
+    
+            const body = { request: "stop" };
+            streaming.send({ message: body });
+            streaming.hangup();
+            
+            setTimeout(() => {
+                subscribeStreaming(janus, opaqueId, streamingCallback);
+                isRecordPreviewActive === false && streamIsLive(false);
+            }, 2000);
+        }
+    
+        if (networkStatus === "up") {
+            reconnectInitiated.current = false;
+        }
+    }, [networkStatus]);
 
 
     const handleErrorVideo = (e) => {
