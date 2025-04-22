@@ -21491,7 +21491,9 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         setRecordedPlaybleFile = _ref.setRecordedPlaybleFile,
         showFramesRate = _ref.showFramesRate,
         playPauseButton = _ref.playPauseButton,
-        streamIsLive = _ref.streamIsLive;
+        streamIsLive = _ref.streamIsLive,
+        networkStatus = _ref.networkStatus,
+        isRecordPreviewActive = _ref.isRecordPreviewActive;
 
     var videoArea = ref;
 
@@ -21515,7 +21517,11 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         janusBitrate = _useState8[0],
         setJanusBitrate = _useState8[1];
 
+    var reconnectInitiated = (0, _react.useRef)(false);
+
     var mystream = null;
+    var streamAttached = false;
+    var streamInterval = null;
 
     (0, _react.useEffect)(function () {
         var unmounted = false;
@@ -21525,11 +21531,34 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
 
         if (!unmounted) {
             (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            streamInterval = setInterval(function () {
+                (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+            }, 2000);
         }
         return function () {
             unmounted = true;
         };
     }, [janus]);
+
+    (0, _react.useEffect)(function () {
+        if (networkStatus === "down" && !reconnectInitiated.current && streaming) {
+            reconnectInitiated.current = true;
+            console.log("[JanusStreamer] Network down detected. Restarting stream...");
+
+            var body = { request: "stop" };
+            streaming.send({ message: body });
+            streaming.hangup();
+
+            setTimeout(function () {
+                (0, _streaming2.subscribeStreaming)(janus, opaqueId, streamingCallback);
+                isRecordPreviewActive === false && streamIsLive(false);
+            }, 2000);
+        }
+
+        if (networkStatus === "up") {
+            reconnectInitiated.current = false;
+        }
+    }, [networkStatus]);
 
     var handleErrorVideo = function handleErrorVideo(e) {
         setRecordedPlaybleFile();
@@ -21557,6 +21586,9 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             if (videoTracks === null || videoTracks === undefined || videoTracks.length === 0) {
                 setPlayerState("Error");
             }
+            streamAttached = true;
+            clearInterval(streamInterval);
+            streamInterval = null;
             console.log("[Attached video stream bitrate :]", _streaming.getBitrate());
             setJanusBitrate(_streaming.getBitrate());
         } else if (eventType === "oncleanup") {
@@ -22227,6 +22259,7 @@ function subscribeStreaming(janus, opaqueId, callback) {
 		onlocalstream: function onlocalstream(stream) {
 			// The subscriber stream is recvonly, we don't expect anything here
 		}
+
 	});
 	return streaming;
 }

@@ -107,7 +107,8 @@ export function subscribeStreaming(janus, opaqueId, callback) {
 			},
 			onlocalstream: function(stream) {
 				// The subscriber stream is recvonly, we don't expect anything here
-			},
+			}
+
         });
     return streaming;
 }

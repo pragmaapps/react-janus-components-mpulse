@@ -64,16 +64,13 @@ const JanusComponent = ({ children, server, isTurnServerEnabled, daqIP }) => {
                 });
             }
         });
-    }
-
-
+    };
+    
     return (
         <div className="janus-container" ref={janusEl}>
-            {children && (
-                React.cloneElement(children, { janus: janusInstance, createConnection: handleConnection })
-            )}
+            {children && React.cloneElement(children, { janus: janusInstance, createConnection: handleConnection })}
         </div>
     );
-}
+};
 
 export default JanusComponent;
