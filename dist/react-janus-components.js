@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 71);
+/******/ 	return __webpack_require__(__webpack_require__.s = 72);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -111,11 +111,11 @@ if (process.env.NODE_ENV !== 'production') {
   // By explicitly using `prop-types` you are opting into new development behavior.
   // http://fb.me/prop-types-in-prod
   var throwOnDirectAccess = true;
-  module.exports = __webpack_require__(79)(ReactIs.isElement, throwOnDirectAccess);
+  module.exports = __webpack_require__(81)(ReactIs.isElement, throwOnDirectAccess);
 } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(78)();
+  module.exports = __webpack_require__(80)();
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
@@ -304,7 +304,7 @@ module.exports = _getPrototypeOf;
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var setPrototypeOf = __webpack_require__(69);
+var setPrototypeOf = __webpack_require__(70);
 
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -348,172 +348,6 @@ module.exports = _possibleConstructorReturn;
 "use strict";
 
 
-var _interopRequireDefault = __webpack_require__(0);
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.formatTime = formatTime;
-exports.isVideoChild = isVideoChild;
-exports.mergeAndSortChildren = mergeAndSortChildren;
-exports.deprecatedWarning = deprecatedWarning;
-exports.throttle = throttle;
-exports.mediaProperties = void 0;
-
-var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(28));
-
-var _objectSpread2 = _interopRequireDefault(__webpack_require__(14));
-
-var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(21));
-
-var _react = _interopRequireDefault(__webpack_require__(1));
-
-// NaN is the only value in javascript which is not equal to itself.
-// eslint-disable-next-line no-self-compare
-var isNaN = Number.isNaN || function (value) {
-  return value !== value;
-};
-/**
- * @file format-time.js
- *
- * Format seconds as a time string, H:MM:SS or M:SS
- * Supplying a guide (in seconds) will force a number of leading zeros
- * to cover the length of the guide
- *
- * @param  {Number} seconds Number of seconds to be turned into a string
- * @param  {Number} guide   Number (in seconds) to model the string after
- * @return {String}         Time formatted as H:MM:SS or M:SS
- * @private
- * @function formatTime
- */
-
-
-function formatTime() {
-  var seconds = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var guide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : seconds;
-  var s = Math.floor(seconds % 60);
-  var m = Math.floor(seconds / 60 % 60);
-  var h = Math.floor(seconds / 3600);
-  var gm = Math.floor(guide / 60 % 60);
-  var gh = Math.floor(guide / 3600); // handle invalid times
-
-  if (isNaN(seconds) || seconds === Infinity) {
-    // '-' is false for all relational operators (e.g. <, >=) so this setting
-    // will add the minimum number of fields specified by the guide
-    h = '-';
-    m = '-';
-    s = '-';
-  } // Check if we need to show hours
-
-
-  h = h > 0 || gh > 0 ? "".concat(h, ":") : ''; // If hours are showing, we may need to add a leading zero.
-  // Always show at least one digit of minutes.
-
-  m = "".concat((h || gm >= 10) && m < 10 ? "0".concat(m) : m, ":"); // Check if leading zero is need for seconds
-
-  s = s < 10 ? "0".concat(s) : s;
-  return h + m + s;
-} // Check if the element belongs to a video element
-// only accept <source />, <track />,
-// <MyComponent isVideoChild />
-// elements
-
-
-function isVideoChild(c) {
-  if (c.props && c.props.isVideoChild) {
-    return true;
-  }
-
-  return c.type === 'source' || c.type === 'track';
-}
-
-var find = function find(elements, func) {
-  return elements.filter(func)[0];
-}; // check if two components are the same type
-
-
-var isTypeEqual = function isTypeEqual(component1, component2) {
-  var type1 = component1.type;
-  var type2 = component2.type;
-
-  if (typeof type1 === 'string' || typeof type2 === 'string') {
-    return type1 === type2;
-  }
-
-  if (typeof type1 === 'function' && typeof type2 === 'function') {
-    return type1.displayName === type2.displayName;
-  }
-
-  return false;
-}; // merge default children
-// sort them by `order` property
-// filter them by `disabled` property
-
-
-function mergeAndSortChildren(defaultChildren, _children, _parentProps) {
-  var defaultOrder = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-
-  var children = _react["default"].Children.toArray(_children);
-
-  var order = _parentProps.order,
-      parentProps = (0, _objectWithoutProperties2["default"])(_parentProps, ["order"]); // ignore order from parent
-
-  return children.filter(function (e) {
-    return !e.props.disabled;
-  }) // filter the disabled components
-  .concat(defaultChildren.filter(function (c) {
-    return !find(children, function (component) {
-      return isTypeEqual(component, c);
-    });
-  })).map(function (element) {
-    var defaultComponent = find(defaultChildren, function (c) {
-      return isTypeEqual(c, element);
-    });
-    var defaultProps = defaultComponent ? defaultComponent.props : {};
-    var props = (0, _objectSpread2["default"])({}, parentProps, defaultProps, element.props);
-
-    var e = _react["default"].cloneElement(element, props, element.props.children);
-
-    return e;
-  }).sort(function (a, b) {
-    return (a.props.order || defaultOrder) - (b.props.order || defaultOrder);
-  });
-}
-/**
- * Temporary utility for generating the warnings
- */
-
-
-function deprecatedWarning(oldMethodCall, newMethodCall) {
-  // eslint-disable-next-line no-console
-  console.warn("WARNING: ".concat(oldMethodCall, " will be deprecated soon! Please use ").concat(newMethodCall, " instead."));
-}
-
-function throttle(callback, limit) {
-  var _arguments = arguments;
-  var wait = false;
-  return function () {
-    if (!wait) {
-      // eslint-disable-next-line prefer-rest-params
-      callback.apply(void 0, (0, _toConsumableArray2["default"])(_arguments));
-      wait = true;
-      setTimeout(function () {
-        wait = false;
-      }, limit);
-    }
-  };
-}
-
-var mediaProperties = ['error', 'src', 'srcObject', 'currentSrc', 'crossOrigin', 'networkState', 'preload', 'buffered', 'readyState', 'seeking', 'currentTime', 'duration', 'paused', 'defaultPlaybackRate', 'playbackRate', 'played', 'seekable', 'ended', 'autoplay', 'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted', 'defaultMuted', 'audioTracks', 'videoTracks', 'textTracks', 'width', 'height', 'videoWidth', 'videoHeight', 'poster'];
-exports.mediaProperties = mediaProperties;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
@@ -543,11 +377,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                                                                                                                                                                                                                                                                */
 
 
-var _jquery = __webpack_require__(22);
+var _jquery = __webpack_require__(17);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _webrtcAdapter = __webpack_require__(102);
+var _webrtcAdapter = __webpack_require__(104);
 
 var _webrtcAdapter2 = _interopRequireDefault(_webrtcAdapter);
 
@@ -4320,6 +4154,172 @@ function Janus(gatewayCallbacks) {
 exports.default = Janus;
 
 /***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(0);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formatTime = formatTime;
+exports.isVideoChild = isVideoChild;
+exports.mergeAndSortChildren = mergeAndSortChildren;
+exports.deprecatedWarning = deprecatedWarning;
+exports.throttle = throttle;
+exports.mediaProperties = void 0;
+
+var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(28));
+
+var _objectSpread2 = _interopRequireDefault(__webpack_require__(14));
+
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(22));
+
+var _react = _interopRequireDefault(__webpack_require__(1));
+
+// NaN is the only value in javascript which is not equal to itself.
+// eslint-disable-next-line no-self-compare
+var isNaN = Number.isNaN || function (value) {
+  return value !== value;
+};
+/**
+ * @file format-time.js
+ *
+ * Format seconds as a time string, H:MM:SS or M:SS
+ * Supplying a guide (in seconds) will force a number of leading zeros
+ * to cover the length of the guide
+ *
+ * @param  {Number} seconds Number of seconds to be turned into a string
+ * @param  {Number} guide   Number (in seconds) to model the string after
+ * @return {String}         Time formatted as H:MM:SS or M:SS
+ * @private
+ * @function formatTime
+ */
+
+
+function formatTime() {
+  var seconds = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var guide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : seconds;
+  var s = Math.floor(seconds % 60);
+  var m = Math.floor(seconds / 60 % 60);
+  var h = Math.floor(seconds / 3600);
+  var gm = Math.floor(guide / 60 % 60);
+  var gh = Math.floor(guide / 3600); // handle invalid times
+
+  if (isNaN(seconds) || seconds === Infinity) {
+    // '-' is false for all relational operators (e.g. <, >=) so this setting
+    // will add the minimum number of fields specified by the guide
+    h = '-';
+    m = '-';
+    s = '-';
+  } // Check if we need to show hours
+
+
+  h = h > 0 || gh > 0 ? "".concat(h, ":") : ''; // If hours are showing, we may need to add a leading zero.
+  // Always show at least one digit of minutes.
+
+  m = "".concat((h || gm >= 10) && m < 10 ? "0".concat(m) : m, ":"); // Check if leading zero is need for seconds
+
+  s = s < 10 ? "0".concat(s) : s;
+  return h + m + s;
+} // Check if the element belongs to a video element
+// only accept <source />, <track />,
+// <MyComponent isVideoChild />
+// elements
+
+
+function isVideoChild(c) {
+  if (c.props && c.props.isVideoChild) {
+    return true;
+  }
+
+  return c.type === 'source' || c.type === 'track';
+}
+
+var find = function find(elements, func) {
+  return elements.filter(func)[0];
+}; // check if two components are the same type
+
+
+var isTypeEqual = function isTypeEqual(component1, component2) {
+  var type1 = component1.type;
+  var type2 = component2.type;
+
+  if (typeof type1 === 'string' || typeof type2 === 'string') {
+    return type1 === type2;
+  }
+
+  if (typeof type1 === 'function' && typeof type2 === 'function') {
+    return type1.displayName === type2.displayName;
+  }
+
+  return false;
+}; // merge default children
+// sort them by `order` property
+// filter them by `disabled` property
+
+
+function mergeAndSortChildren(defaultChildren, _children, _parentProps) {
+  var defaultOrder = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var children = _react["default"].Children.toArray(_children);
+
+  var order = _parentProps.order,
+      parentProps = (0, _objectWithoutProperties2["default"])(_parentProps, ["order"]); // ignore order from parent
+
+  return children.filter(function (e) {
+    return !e.props.disabled;
+  }) // filter the disabled components
+  .concat(defaultChildren.filter(function (c) {
+    return !find(children, function (component) {
+      return isTypeEqual(component, c);
+    });
+  })).map(function (element) {
+    var defaultComponent = find(defaultChildren, function (c) {
+      return isTypeEqual(c, element);
+    });
+    var defaultProps = defaultComponent ? defaultComponent.props : {};
+    var props = (0, _objectSpread2["default"])({}, parentProps, defaultProps, element.props);
+
+    var e = _react["default"].cloneElement(element, props, element.props.children);
+
+    return e;
+  }).sort(function (a, b) {
+    return (a.props.order || defaultOrder) - (b.props.order || defaultOrder);
+  });
+}
+/**
+ * Temporary utility for generating the warnings
+ */
+
+
+function deprecatedWarning(oldMethodCall, newMethodCall) {
+  // eslint-disable-next-line no-console
+  console.warn("WARNING: ".concat(oldMethodCall, " will be deprecated soon! Please use ").concat(newMethodCall, " instead."));
+}
+
+function throttle(callback, limit) {
+  var _arguments = arguments;
+  var wait = false;
+  return function () {
+    if (!wait) {
+      // eslint-disable-next-line prefer-rest-params
+      callback.apply(void 0, (0, _toConsumableArray2["default"])(_arguments));
+      wait = true;
+      setTimeout(function () {
+        wait = false;
+      }, limit);
+    }
+  };
+}
+
+var mediaProperties = ['error', 'src', 'srcObject', 'currentSrc', 'crossOrigin', 'networkState', 'preload', 'buffered', 'readyState', 'seeking', 'currentTime', 'duration', 'paused', 'defaultPlaybackRate', 'playbackRate', 'played', 'seekable', 'ended', 'autoplay', 'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted', 'defaultMuted', 'audioTracks', 'videoTracks', 'textTracks', 'width', 'height', 'videoWidth', 'videoHeight', 'poster'];
+exports.mediaProperties = mediaProperties;
+
+/***/ }),
 /* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -4592,7 +4592,7 @@ function filterStats(result, track, outbound) {
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var defineProperty = __webpack_require__(20);
+var defineProperty = __webpack_require__(21);
 
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -4831,506 +4831,6 @@ module.exports = _extends;
 
 /***/ }),
 /* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _interopRequireDefault = __webpack_require__(0);
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.handleFullscreenChange = handleFullscreenChange;
-exports.activate = activate;
-exports.userActivate = userActivate;
-exports.play = play;
-exports.pause = pause;
-exports.togglePlay = togglePlay;
-exports.seek = seek;
-exports.forward = forward;
-exports.replay = replay;
-exports.changeRate = changeRate;
-exports.changeVolume = changeVolume;
-exports.mute = mute;
-exports.toggleFullscreen = toggleFullscreen;
-exports.USER_ACTIVATE = exports.PLAYER_ACTIVATE = exports.FULLSCREEN_CHANGE = exports.OPERATE = void 0;
-
-var _fullscreen = _interopRequireDefault(__webpack_require__(58));
-
-var OPERATE = 'video-react/OPERATE';
-exports.OPERATE = OPERATE;
-var FULLSCREEN_CHANGE = 'video-react/FULLSCREEN_CHANGE';
-exports.FULLSCREEN_CHANGE = FULLSCREEN_CHANGE;
-var PLAYER_ACTIVATE = 'video-react/PLAYER_ACTIVATE';
-exports.PLAYER_ACTIVATE = PLAYER_ACTIVATE;
-var USER_ACTIVATE = 'video-react/USER_ACTIVATE';
-exports.USER_ACTIVATE = USER_ACTIVATE;
-
-function handleFullscreenChange(isFullscreen) {
-  return {
-    type: FULLSCREEN_CHANGE,
-    isFullscreen: isFullscreen
-  };
-}
-
-function activate(activity) {
-  return {
-    type: PLAYER_ACTIVATE,
-    activity: activity
-  };
-}
-
-function userActivate(activity) {
-  return {
-    type: USER_ACTIVATE,
-    activity: activity
-  };
-}
-
-function play() {
-  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-    action: 'play',
-    source: ''
-  };
-  this.video.play();
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function pause() {
-  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-    action: 'pause',
-    source: ''
-  };
-  this.video.pause();
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function togglePlay() {
-  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-    action: 'toggle-play',
-    source: ''
-  };
-  this.video.togglePlay();
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-} // seek video by time
-
-
-function seek(time) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: 'seek',
-    source: ''
-  };
-  this.video.seek(time);
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-} // jump forward x seconds
-
-
-function forward(seconds) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: "forward-".concat(seconds),
-    source: ''
-  };
-  this.video.forward(seconds);
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-} // jump back x seconds
-
-
-function replay(seconds) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: "replay-".concat(seconds),
-    source: ''
-  };
-  this.video.replay(seconds);
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function changeRate(rate) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: 'change-rate',
-    source: ''
-  };
-  this.video.playbackRate = rate;
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function changeVolume(volume) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: 'change-volume',
-    source: ''
-  };
-  var v = volume;
-
-  if (volume < 0) {
-    v = 0;
-  }
-
-  if (volume > 1) {
-    v = 1;
-  }
-
-  this.video.volume = v;
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function mute(muted) {
-  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-    action: muted ? 'muted' : 'unmuted',
-    source: ''
-  };
-  this.video.muted = muted;
-  return {
-    type: OPERATE,
-    operation: operation
-  };
-}
-
-function toggleFullscreen(player) {
-  if (_fullscreen["default"].enabled) {
-    if (_fullscreen["default"].isFullscreen) {
-      _fullscreen["default"].exit();
-    } else {
-      _fullscreen["default"].request(this.rootElement);
-    }
-
-    return {
-      type: OPERATE,
-      operation: {
-        action: 'toggle-fullscreen',
-        source: ''
-      }
-    };
-  }
-
-  return {
-    type: FULLSCREEN_CHANGE,
-    isFullscreen: !player.isFullscreen
-  };
-}
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.findElPosition = findElPosition;
-exports.getPointerPosition = getPointerPosition;
-exports.blurNode = blurNode;
-exports.focusNode = focusNode;
-exports.hasClass = hasClass;
-
-/**
- * Offset Left
- * getBoundingClientRect technique from
- * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
- *
- * @function findElPosition
- * @param {ReactNodeRef} el React Node ref from which to get offset
- * @return {Object}
- */
-function findElPosition(el) {
-  var box;
-
-  if (el.getBoundingClientRect && el.parentNode) {
-    box = el.getBoundingClientRect();
-  }
-
-  if (!box) {
-    return {
-      left: 0,
-      top: 0
-    };
-  }
-
-  var _document = document,
-      body = _document.body,
-      docEl = _document.documentElement;
-  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-  var scrollLeft = window.pageXOffset || body.scrollLeft;
-  var left = box.left + scrollLeft - clientLeft;
-  var clientTop = docEl.clientTop || body.clientTop || 0;
-  var scrollTop = window.pageYOffset || body.scrollTop;
-  var top = box.top + scrollTop - clientTop; // Android sometimes returns slightly off decimal values, so need to round
-
-  return {
-    left: Math.round(left),
-    top: Math.round(top)
-  };
-}
-/**
- * Get pointer position in a React Node ref
- * Returns an object with x and y coordinates.
- * The base on the coordinates are the bottom left of the element.
- *
- * @function getPointerPosition
- * @param {ReactNodeRef} el React Node ref on which to get the pointer position on
- * @param {Event} event Event object
- * @return {Object} This object will have x and y coordinates corresponding to the mouse position
- */
-
-
-function getPointerPosition(el, event) {
-  var position = {};
-  var box = findElPosition(el);
-  var boxW = el.offsetWidth;
-  var boxH = el.offsetHeight;
-  var boxY = box.top;
-  var boxX = box.left;
-  var evtPageY = event.pageY;
-  var evtPageX = event.pageX;
-
-  if (event.changedTouches) {
-    evtPageX = event.changedTouches[0].pageX;
-    evtPageY = event.changedTouches[0].pageY;
-  }
-
-  position.y = Math.max(0, Math.min(1, (boxY - evtPageY + boxH) / boxH));
-  position.x = Math.max(0, Math.min(1, (evtPageX - boxX) / boxW));
-  return position;
-} // blur an element
-
-
-function blurNode(reactNode) {
-  if (reactNode && reactNode.blur) {
-    reactNode.blur();
-  }
-} // focus an element
-
-
-function focusNode(reactNode) {
-  if (reactNode && reactNode.focus) {
-    reactNode.focus();
-  }
-} // check if an element has a class name
-
-
-function hasClass(elm, cls) {
-  var classes = elm.className.split(' ');
-
-  for (var i = 0; i < classes.length; i++) {
-    if (classes[i].toLowerCase() === cls.toLowerCase()) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var JanusPlayer = _react2.default.forwardRef(function (_ref, ref) {
-    var isPublisher = _ref.isPublisher,
-        status = _ref.status,
-        isMuted = _ref.isMuted,
-        onStart = _ref.onStart,
-        onStop = _ref.onStop,
-        onMute = _ref.onMute,
-        onUnmute = _ref.onUnmute,
-        onBandwidthChange = _ref.onBandwidthChange;
-
-    return _react2.default.createElement(
-        "div",
-        { className: "janus-video-container", ref: ref },
-        _react2.default.createElement(
-            "div",
-            { className: "janus-video-status" },
-            status === "Ready" && _react2.default.createElement(
-                "span",
-                { style: { color: "grey" } },
-                "Ready"
-            ),
-            status === "Paused" && _react2.default.createElement(
-                "span",
-                { style: { color: "grey" } },
-                "Paused"
-            ),
-            status === "Live" && _react2.default.createElement(
-                "span",
-                { style: { color: "green" } },
-                "Live"
-            ),
-            status === "Error" && _react2.default.createElement(
-                "span",
-                { style: { color: "red" } },
-                "Error"
-            )
-        ),
-        _react2.default.createElement("video", {
-            className: "janus-video-player",
-            autoPlay: true,
-            playsInline: true }),
-        isPublisher && _react2.default.createElement(
-            "div",
-            { className: "janus-video-controls" },
-            status === "Paused" && _react2.default.createElement(
-                "div",
-                { className: "janus-btn", onClick: onStart },
-                "Start Recording"
-            ),
-            status === "Live" && _react2.default.createElement(
-                "div",
-                { className: "janus-btn", onClick: onStop },
-                "Stop Recording"
-            ),
-            status === "Live" && _react2.default.createElement(
-                _react2.default.Fragment,
-                null,
-                isMuted && _react2.default.createElement(
-                    "div",
-                    { className: "janus-btn", onClick: onUnmute },
-                    "UnMute"
-                ),
-                !isMuted && _react2.default.createElement(
-                    "div",
-                    { className: "janus-btn", onClick: onMute },
-                    "Mute"
-                )
-            ),
-            _react2.default.createElement(
-                "div",
-                { className: "janus-select" },
-                _react2.default.createElement(
-                    "select",
-                    { onChange: function onChange(e) {
-                            onBandwidthChange(parseInt(e.target.value) * 1000);
-                        } },
-                    _react2.default.createElement(
-                        "option",
-                        { value: 0 },
-                        "Auto"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 128 },
-                        "128 kbit"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 256 },
-                        "256 kbit"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 512 },
-                        "512 kbit"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 1000 },
-                        "1 mbit"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 1500 },
-                        "1.5 mbit"
-                    ),
-                    _react2.default.createElement(
-                        "option",
-                        { value: 2000 },
-                        "2 mbit"
-                    )
-                )
-            )
-        )
-    );
-});
-
-exports.default = JanusPlayer;
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-module.exports = _defineProperty;
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var objectWithoutPropertiesLoose = __webpack_require__(68);
-
-function _objectWithoutProperties(source, excluded) {
-  if (source == null) return {};
-  var target = objectWithoutPropertiesLoose(source, excluded);
-  var key, i;
-
-  if (Object.getOwnPropertySymbols) {
-    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-
-    for (i = 0; i < sourceSymbolKeys.length; i++) {
-      key = sourceSymbolKeys[i];
-      if (excluded.indexOf(key) >= 0) continue;
-      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-      target[key] = source[key];
-    }
-  }
-
-  return target;
-}
-
-module.exports = _objectWithoutProperties;
-
-/***/ }),
-/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -15935,6 +15435,506 @@ return jQuery;
 
 
 /***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(0);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.handleFullscreenChange = handleFullscreenChange;
+exports.activate = activate;
+exports.userActivate = userActivate;
+exports.play = play;
+exports.pause = pause;
+exports.togglePlay = togglePlay;
+exports.seek = seek;
+exports.forward = forward;
+exports.replay = replay;
+exports.changeRate = changeRate;
+exports.changeVolume = changeVolume;
+exports.mute = mute;
+exports.toggleFullscreen = toggleFullscreen;
+exports.USER_ACTIVATE = exports.PLAYER_ACTIVATE = exports.FULLSCREEN_CHANGE = exports.OPERATE = void 0;
+
+var _fullscreen = _interopRequireDefault(__webpack_require__(58));
+
+var OPERATE = 'video-react/OPERATE';
+exports.OPERATE = OPERATE;
+var FULLSCREEN_CHANGE = 'video-react/FULLSCREEN_CHANGE';
+exports.FULLSCREEN_CHANGE = FULLSCREEN_CHANGE;
+var PLAYER_ACTIVATE = 'video-react/PLAYER_ACTIVATE';
+exports.PLAYER_ACTIVATE = PLAYER_ACTIVATE;
+var USER_ACTIVATE = 'video-react/USER_ACTIVATE';
+exports.USER_ACTIVATE = USER_ACTIVATE;
+
+function handleFullscreenChange(isFullscreen) {
+  return {
+    type: FULLSCREEN_CHANGE,
+    isFullscreen: isFullscreen
+  };
+}
+
+function activate(activity) {
+  return {
+    type: PLAYER_ACTIVATE,
+    activity: activity
+  };
+}
+
+function userActivate(activity) {
+  return {
+    type: USER_ACTIVATE,
+    activity: activity
+  };
+}
+
+function play() {
+  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    action: 'play',
+    source: ''
+  };
+  this.video.play();
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function pause() {
+  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    action: 'pause',
+    source: ''
+  };
+  this.video.pause();
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function togglePlay() {
+  var operation = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    action: 'toggle-play',
+    source: ''
+  };
+  this.video.togglePlay();
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+} // seek video by time
+
+
+function seek(time) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: 'seek',
+    source: ''
+  };
+  this.video.seek(time);
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+} // jump forward x seconds
+
+
+function forward(seconds) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: "forward-".concat(seconds),
+    source: ''
+  };
+  this.video.forward(seconds);
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+} // jump back x seconds
+
+
+function replay(seconds) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: "replay-".concat(seconds),
+    source: ''
+  };
+  this.video.replay(seconds);
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function changeRate(rate) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: 'change-rate',
+    source: ''
+  };
+  this.video.playbackRate = rate;
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function changeVolume(volume) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: 'change-volume',
+    source: ''
+  };
+  var v = volume;
+
+  if (volume < 0) {
+    v = 0;
+  }
+
+  if (volume > 1) {
+    v = 1;
+  }
+
+  this.video.volume = v;
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function mute(muted) {
+  var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+    action: muted ? 'muted' : 'unmuted',
+    source: ''
+  };
+  this.video.muted = muted;
+  return {
+    type: OPERATE,
+    operation: operation
+  };
+}
+
+function toggleFullscreen(player) {
+  if (_fullscreen["default"].enabled) {
+    if (_fullscreen["default"].isFullscreen) {
+      _fullscreen["default"].exit();
+    } else {
+      _fullscreen["default"].request(this.rootElement);
+    }
+
+    return {
+      type: OPERATE,
+      operation: {
+        action: 'toggle-fullscreen',
+        source: ''
+      }
+    };
+  }
+
+  return {
+    type: FULLSCREEN_CHANGE,
+    isFullscreen: !player.isFullscreen
+  };
+}
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.findElPosition = findElPosition;
+exports.getPointerPosition = getPointerPosition;
+exports.blurNode = blurNode;
+exports.focusNode = focusNode;
+exports.hasClass = hasClass;
+
+/**
+ * Offset Left
+ * getBoundingClientRect technique from
+ * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
+ *
+ * @function findElPosition
+ * @param {ReactNodeRef} el React Node ref from which to get offset
+ * @return {Object}
+ */
+function findElPosition(el) {
+  var box;
+
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
+
+  if (!box) {
+    return {
+      left: 0,
+      top: 0
+    };
+  }
+
+  var _document = document,
+      body = _document.body,
+      docEl = _document.documentElement;
+  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  var scrollLeft = window.pageXOffset || body.scrollLeft;
+  var left = box.left + scrollLeft - clientLeft;
+  var clientTop = docEl.clientTop || body.clientTop || 0;
+  var scrollTop = window.pageYOffset || body.scrollTop;
+  var top = box.top + scrollTop - clientTop; // Android sometimes returns slightly off decimal values, so need to round
+
+  return {
+    left: Math.round(left),
+    top: Math.round(top)
+  };
+}
+/**
+ * Get pointer position in a React Node ref
+ * Returns an object with x and y coordinates.
+ * The base on the coordinates are the bottom left of the element.
+ *
+ * @function getPointerPosition
+ * @param {ReactNodeRef} el React Node ref on which to get the pointer position on
+ * @param {Event} event Event object
+ * @return {Object} This object will have x and y coordinates corresponding to the mouse position
+ */
+
+
+function getPointerPosition(el, event) {
+  var position = {};
+  var box = findElPosition(el);
+  var boxW = el.offsetWidth;
+  var boxH = el.offsetHeight;
+  var boxY = box.top;
+  var boxX = box.left;
+  var evtPageY = event.pageY;
+  var evtPageX = event.pageX;
+
+  if (event.changedTouches) {
+    evtPageX = event.changedTouches[0].pageX;
+    evtPageY = event.changedTouches[0].pageY;
+  }
+
+  position.y = Math.max(0, Math.min(1, (boxY - evtPageY + boxH) / boxH));
+  position.x = Math.max(0, Math.min(1, (evtPageX - boxX) / boxW));
+  return position;
+} // blur an element
+
+
+function blurNode(reactNode) {
+  if (reactNode && reactNode.blur) {
+    reactNode.blur();
+  }
+} // focus an element
+
+
+function focusNode(reactNode) {
+  if (reactNode && reactNode.focus) {
+    reactNode.focus();
+  }
+} // check if an element has a class name
+
+
+function hasClass(elm, cls) {
+  var classes = elm.className.split(' ');
+
+  for (var i = 0; i < classes.length; i++) {
+    if (classes[i].toLowerCase() === cls.toLowerCase()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var JanusPlayer = _react2.default.forwardRef(function (_ref, ref) {
+    var isPublisher = _ref.isPublisher,
+        status = _ref.status,
+        isMuted = _ref.isMuted,
+        onStart = _ref.onStart,
+        onStop = _ref.onStop,
+        onMute = _ref.onMute,
+        onUnmute = _ref.onUnmute,
+        onBandwidthChange = _ref.onBandwidthChange;
+
+    return _react2.default.createElement(
+        "div",
+        { className: "janus-video-container", ref: ref },
+        _react2.default.createElement(
+            "div",
+            { className: "janus-video-status" },
+            status === "Ready" && _react2.default.createElement(
+                "span",
+                { style: { color: "grey" } },
+                "Ready"
+            ),
+            status === "Paused" && _react2.default.createElement(
+                "span",
+                { style: { color: "grey" } },
+                "Paused"
+            ),
+            status === "Live" && _react2.default.createElement(
+                "span",
+                { style: { color: "green" } },
+                "Live"
+            ),
+            status === "Error" && _react2.default.createElement(
+                "span",
+                { style: { color: "red" } },
+                "Error"
+            )
+        ),
+        _react2.default.createElement("video", {
+            className: "janus-video-player",
+            autoPlay: true,
+            playsInline: true }),
+        isPublisher && _react2.default.createElement(
+            "div",
+            { className: "janus-video-controls" },
+            status === "Paused" && _react2.default.createElement(
+                "div",
+                { className: "janus-btn", onClick: onStart },
+                "Start Recording"
+            ),
+            status === "Live" && _react2.default.createElement(
+                "div",
+                { className: "janus-btn", onClick: onStop },
+                "Stop Recording"
+            ),
+            status === "Live" && _react2.default.createElement(
+                _react2.default.Fragment,
+                null,
+                isMuted && _react2.default.createElement(
+                    "div",
+                    { className: "janus-btn", onClick: onUnmute },
+                    "UnMute"
+                ),
+                !isMuted && _react2.default.createElement(
+                    "div",
+                    { className: "janus-btn", onClick: onMute },
+                    "Mute"
+                )
+            ),
+            _react2.default.createElement(
+                "div",
+                { className: "janus-select" },
+                _react2.default.createElement(
+                    "select",
+                    { onChange: function onChange(e) {
+                            onBandwidthChange(parseInt(e.target.value) * 1000);
+                        } },
+                    _react2.default.createElement(
+                        "option",
+                        { value: 0 },
+                        "Auto"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 128 },
+                        "128 kbit"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 256 },
+                        "256 kbit"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 512 },
+                        "512 kbit"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 1000 },
+                        "1 mbit"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 1500 },
+                        "1.5 mbit"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: 2000 },
+                        "2 mbit"
+                    )
+                )
+            )
+        )
+    );
+});
+
+exports.default = JanusPlayer;
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+module.exports = _defineProperty;
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var objectWithoutPropertiesLoose = __webpack_require__(69);
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = objectWithoutPropertiesLoose(source, excluded);
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
+module.exports = _objectWithoutProperties;
+
+/***/ }),
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16259,7 +16259,7 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var Dom = _interopRequireWildcard(__webpack_require__(18));
+var Dom = _interopRequireWildcard(__webpack_require__(19));
 
 var propTypes = {
   className: _propTypes["default"].string,
@@ -16652,9 +16652,9 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _Menu = _interopRequireDefault(__webpack_require__(91));
+var _Menu = _interopRequireDefault(__webpack_require__(93));
 
-var _MenuItem = _interopRequireDefault(__webpack_require__(92));
+var _MenuItem = _interopRequireDefault(__webpack_require__(94));
 
 var _ClickableComponent = _interopRequireDefault(__webpack_require__(35));
 
@@ -16891,11 +16891,11 @@ MenuButton.displayName = 'MenuButton';
 /* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayWithoutHoles = __webpack_require__(65);
+var arrayWithoutHoles = __webpack_require__(66);
 
-var iterableToArray = __webpack_require__(66);
+var iterableToArray = __webpack_require__(67);
 
-var nonIterableSpread = __webpack_require__(67);
+var nonIterableSpread = __webpack_require__(68);
 
 function _toConsumableArray(arr) {
   return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
@@ -16937,7 +16937,7 @@ exports.publishToRoom = publishToRoom;
 exports.publishOwnFeed = publishOwnFeed;
 exports.unpublishOwnFeed = unpublishOwnFeed;
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -17114,9 +17114,9 @@ function unpublishOwnFeed(sfutest) {
 /* WEBPACK VAR INJECTION */(function(process) {
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports = __webpack_require__(81);
+  module.exports = __webpack_require__(83);
 } else {
-  module.exports = __webpack_require__(80);
+  module.exports = __webpack_require__(82);
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
@@ -18347,7 +18347,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _defineProperty2 = _interopRequireDefault(__webpack_require__(20));
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(21));
 
 var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(28));
 
@@ -18367,7 +18367,7 @@ var _react = __webpack_require__(1);
 
 var _propTypes = _interopRequireDefault(__webpack_require__(2));
 
-var _dom = __webpack_require__(18);
+var _dom = __webpack_require__(19);
 
 var propTypes = {
   clickable: _propTypes["default"].bool,
@@ -18787,7 +18787,7 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   actions: _propTypes["default"].object,
@@ -19505,7 +19505,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
-var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(21));
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(22));
 
 var _classCallCheck2 = _interopRequireDefault(__webpack_require__(4));
 
@@ -19547,7 +19547,7 @@ var _VolumeMenuButton = _interopRequireDefault(__webpack_require__(51));
 
 var _PlaybackRateMenuButton = _interopRequireDefault(__webpack_require__(26));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   children: _propTypes["default"].any,
@@ -20002,7 +20002,7 @@ var _react = _interopRequireDefault(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 function MouseTimeDisplay(_ref) {
   var duration = _ref.duration,
@@ -20053,7 +20053,7 @@ var _react = _interopRequireDefault(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   currentTime: _propTypes["default"].number,
@@ -20219,7 +20219,7 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var Dom = _interopRequireWildcard(__webpack_require__(18));
+var Dom = _interopRequireWildcard(__webpack_require__(19));
 
 var _SeekBar = _interopRequireDefault(__webpack_require__(50));
 
@@ -20354,7 +20354,7 @@ var _LoadProgressBar = _interopRequireDefault(__webpack_require__(44));
 
 var _MouseTimeDisplay = _interopRequireDefault(__webpack_require__(45));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   player: _propTypes["default"].object,
@@ -20530,9 +20530,9 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _PopupButton = _interopRequireDefault(__webpack_require__(94));
+var _PopupButton = _interopRequireDefault(__webpack_require__(96));
 
-var _VolumeBar = _interopRequireDefault(__webpack_require__(95));
+var _VolumeBar = _interopRequireDefault(__webpack_require__(97));
 
 var propTypes = {
   player: _propTypes["default"].object,
@@ -20662,7 +20662,7 @@ var _react = _interopRequireDefault(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   player: _propTypes["default"].object,
@@ -20710,7 +20710,7 @@ var _react = _interopRequireDefault(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   player: _propTypes["default"].object,
@@ -20756,7 +20756,7 @@ var _react = _interopRequireDefault(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var propTypes = {
   player: _propTypes["default"].object,
@@ -21013,7 +21013,7 @@ Object.defineProperty(exports, "operationReducer", {
 });
 exports.videoActions = exports.playerActions = void 0;
 
-var _Player = _interopRequireDefault(__webpack_require__(88));
+var _Player = _interopRequireDefault(__webpack_require__(90));
 
 var _Video = _interopRequireDefault(__webpack_require__(39));
 
@@ -21053,9 +21053,9 @@ var _VolumeMenuButton = _interopRequireDefault(__webpack_require__(51));
 
 var _PlaybackRateMenuButton = _interopRequireDefault(__webpack_require__(26));
 
-var _PlaybackRate = _interopRequireDefault(__webpack_require__(90));
+var _PlaybackRate = _interopRequireDefault(__webpack_require__(92));
 
-var _ClosedCaptionButton = _interopRequireDefault(__webpack_require__(89));
+var _ClosedCaptionButton = _interopRequireDefault(__webpack_require__(91));
 
 var _RemainingTimeDisplay = _interopRequireDefault(__webpack_require__(54));
 
@@ -21067,7 +21067,7 @@ var _TimeDivider = _interopRequireDefault(__webpack_require__(55));
 
 var _MenuButton = _interopRequireDefault(__webpack_require__(27));
 
-var playerActions = _interopRequireWildcard(__webpack_require__(17));
+var playerActions = _interopRequireWildcard(__webpack_require__(18));
 
 exports.playerActions = playerActions;
 
@@ -21092,9 +21092,9 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = _default;
 exports.operationReducer = exports.playerReducer = void 0;
 
-var _player = _interopRequireDefault(__webpack_require__(98));
+var _player = _interopRequireDefault(__webpack_require__(100));
 
-var _operation = _interopRequireDefault(__webpack_require__(97));
+var _operation = _interopRequireDefault(__webpack_require__(99));
 
 function _default() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -21214,7 +21214,7 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -21311,19 +21311,94 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _jquery = __webpack_require__(17);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _janus = __webpack_require__(11);
+
+var _janus2 = _interopRequireDefault(_janus);
+
+var _datachannel2 = __webpack_require__(73);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var dataChannelData = '';
+var timer = '';
+var JanusDatachannel = _react2.default.forwardRef(function (_ref, ref) {
+    var janus = _ref.janus,
+        opaqueId = _ref.opaqueId,
+        streamId = _ref.streamId,
+        handleDataChannelData = _ref.handleDataChannelData;
+
+
+    (0, _react.useEffect)(function () {
+        var unmounted = false;
+        if (!janus && !unmounted) {
+            return;
+        }
+
+        if (!unmounted) {
+            (0, _datachannel2.subscribeDatachannel)(janus, opaqueId, datachannelCallback);
+        }
+        return function () {
+            unmounted = true;
+        };
+    }, [janus]);
+    /*const datachannelCallback = (_datachannel, eventType, data) => {
+        //console.log("[React Janus component][data we received from dataChannel]", _datachannel, eventType, data);
+        clearTimeout(timer);
+        if(data && eventType == "ondata" && data != "datachannel") {
+            dataChannelData = dataChannelData.concat(data);
+        }
+        console.log("dataChannelData",dataChannelData );
+        timer = setTimeout(()=> {
+            handleDataChannelData(dataChannelData);
+        },8000);
+    }*/
+    var datachannelCallback = function datachannelCallback(_datachannel, eventType, data) {
+        if (data && eventType == "ondata" && data != "datachannel") {
+            var parsedObject = JSON.parse(data);
+            var histogramData = parsedObject.histogram;
+            for (var i = 0, t = 155; i < t; i++) {
+                histogramData.push(Math.floor(Math.random() * (4 + t)) * 0);
+            }
+            handleDataChannelData(histogramData);
+        }
+    };
+    return _react2.default.createElement('div', null);
+});
+
+exports.default = JanusDatachannel;
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
 var _publisher = __webpack_require__(30);
 
-var _JanusPlayer = __webpack_require__(19);
+var _JanusPlayer = __webpack_require__(20);
 
 var _JanusPlayer2 = _interopRequireDefault(_JanusPlayer);
 
@@ -21446,7 +21521,7 @@ var JanusPublisher = function JanusPublisher(_ref) {
 exports.default = JanusPublisher;
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21462,17 +21537,17 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _jquery = __webpack_require__(22);
+var _jquery = __webpack_require__(17);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
-var _streaming2 = __webpack_require__(72);
+var _streaming2 = __webpack_require__(74);
 
-var _JanusStreamPlayer = __webpack_require__(70);
+var _JanusStreamPlayer = __webpack_require__(71);
 
 var _JanusStreamPlayer2 = _interopRequireDefault(_JanusStreamPlayer);
 
@@ -21622,7 +21697,7 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
 exports.default = JanusStreamer;
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21638,19 +21713,19 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _jquery = __webpack_require__(22);
+var _jquery = __webpack_require__(17);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
 var _publisher2 = __webpack_require__(30);
 
-var _subscriber = __webpack_require__(73);
+var _subscriber = __webpack_require__(75);
 
-var _JanusPlayer = __webpack_require__(19);
+var _JanusPlayer = __webpack_require__(20);
 
 var _JanusPlayer2 = _interopRequireDefault(_JanusPlayer);
 
@@ -21769,7 +21844,7 @@ var JanusSubscriber = function JanusSubscriber(_ref) {
 exports.default = JanusSubscriber;
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21783,7 +21858,7 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -21810,10 +21885,10 @@ var JanusVideoRoom = function JanusVideoRoom(_ref) {
 exports.default = JanusVideoRoom;
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var content = __webpack_require__(74);
+var content = __webpack_require__(76);
 
 if (typeof content === 'string') {
   content = [[module.i, content, '']];
@@ -21824,7 +21899,7 @@ var options = {}
 options.insert = "head";
 options.singleton = false;
 
-var update = __webpack_require__(84)(content, options);
+var update = __webpack_require__(86)(content, options);
 
 if (content.locals) {
   module.exports = content.locals;
@@ -21832,7 +21907,7 @@ if (content.locals) {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 function _arrayWithoutHoles(arr) {
@@ -21848,7 +21923,7 @@ function _arrayWithoutHoles(arr) {
 module.exports = _arrayWithoutHoles;
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports) {
 
 function _iterableToArray(iter) {
@@ -21858,7 +21933,7 @@ function _iterableToArray(iter) {
 module.exports = _iterableToArray;
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports) {
 
 function _nonIterableSpread() {
@@ -21868,7 +21943,7 @@ function _nonIterableSpread() {
 module.exports = _nonIterableSpread;
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports) {
 
 function _objectWithoutPropertiesLoose(source, excluded) {
@@ -21889,7 +21964,7 @@ function _objectWithoutPropertiesLoose(source, excluded) {
 module.exports = _objectWithoutPropertiesLoose;
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports) {
 
 function _setPrototypeOf(o, p) {
@@ -21904,7 +21979,7 @@ function _setPrototypeOf(o, p) {
 module.exports = _setPrototypeOf;
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22087,7 +22162,7 @@ var JanusStreamPlayer = _react2.default.forwardRef(function (_ref, ref) {
 exports.default = JanusStreamPlayer;
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22096,11 +22171,11 @@ exports.default = JanusStreamPlayer;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.JanusPlayer = exports.JanusStreamer = exports.JanusSubscriber = exports.JanusPublisher = exports.JanusVideoRoom = exports.JanusComponent = exports.Janus = undefined;
+exports.JanusDatachannel = exports.JanusPlayer = exports.JanusStreamer = exports.JanusSubscriber = exports.JanusPublisher = exports.JanusVideoRoom = exports.JanusComponent = exports.Janus = undefined;
 
-__webpack_require__(64);
+__webpack_require__(65);
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -22108,25 +22183,29 @@ var _JanusComponent = __webpack_require__(59);
 
 var _JanusComponent2 = _interopRequireDefault(_JanusComponent);
 
-var _JanusVideoRoom = __webpack_require__(63);
+var _JanusVideoRoom = __webpack_require__(64);
 
 var _JanusVideoRoom2 = _interopRequireDefault(_JanusVideoRoom);
 
-var _JanusPublisher = __webpack_require__(60);
+var _JanusPublisher = __webpack_require__(61);
 
 var _JanusPublisher2 = _interopRequireDefault(_JanusPublisher);
 
-var _JanusSubscriber = __webpack_require__(62);
+var _JanusSubscriber = __webpack_require__(63);
 
 var _JanusSubscriber2 = _interopRequireDefault(_JanusSubscriber);
 
-var _JanusStreamer = __webpack_require__(61);
+var _JanusStreamer = __webpack_require__(62);
 
 var _JanusStreamer2 = _interopRequireDefault(_JanusStreamer);
 
-var _JanusPlayer = __webpack_require__(19);
+var _JanusPlayer = __webpack_require__(20);
 
 var _JanusPlayer2 = _interopRequireDefault(_JanusPlayer);
+
+var _JanusDatachannel = __webpack_require__(60);
+
+var _JanusDatachannel2 = _interopRequireDefault(_JanusDatachannel);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22137,9 +22216,81 @@ exports.JanusPublisher = _JanusPublisher2.default;
 exports.JanusSubscriber = _JanusSubscriber2.default;
 exports.JanusStreamer = _JanusStreamer2.default;
 exports.JanusPlayer = _JanusPlayer2.default;
+exports.JanusDatachannel = _JanusDatachannel2.default;
 
 /***/ }),
-/* 72 */
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.subscribeDatachannel = subscribeDatachannel;
+
+var _janus = __webpack_require__(11);
+
+var _janus2 = _interopRequireDefault(_janus);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function subscribeDatachannel(janus, opaqueId, callback) {
+    var datachannel = null;
+    var selectedDataChannel = 15;
+    janus.attach({
+        plugin: "janus.plugin.streaming",
+        opaqueId: opaqueId,
+        success: function success(pluginHandle) {
+            datachannel = pluginHandle;
+            _janus2.default.log("Data channel Plugin attached! (" + datachannel.getPlugin() + ", id=" + datachannel.getId() + ")");
+            var body = { "request": "watch", id: parseInt(selectedDataChannel) };
+            datachannel.send({ "message": body });
+        },
+        error: function error(_error) {
+            _janus2.default.error("  -- Error attaching plugin...", _error);
+            callback(datachannel, "error", _error);
+        },
+        onmessage: function onmessage(msg, jsep) {
+            _janus2.default.debug(" ::: Got a message on data channel :::");
+            _janus2.default.debug(msg);
+            if (jsep !== undefined && jsep !== null) {
+                _janus2.default.debug("Handling data channel SDP as well...");
+                _janus2.default.debug(jsep);
+                // Offer from the plugin, let's answer
+                datachannel.createAnswer({
+                    jsep: jsep,
+                    media: { audio: false, video: false, data: true }, // We want data only
+                    success: function success(jsep) {
+                        _janus2.default.debug("Got SDP!");
+                        _janus2.default.debug(jsep);
+                        var body = { "request": "start" };
+                        datachannel.send({ "message": body, "jsep": jsep });
+                    },
+                    error: function error(_error2) {
+                        _janus2.default.error("WebRTC error:", _error2);
+                    }
+                });
+            }
+        },
+        ondataopen: function ondataopen(datachannel) {
+            console.log("The DataChannel is available!");
+            callback(datachannel, "ondataopen", datachannel);
+        },
+        ondata: function ondata(datachannel) {
+            console.log("We got data from the DataChannel!", datachannel);
+            //callback(datachannel, "ondata", datachannel);
+        },
+        oncleanup: function oncleanup() {
+            // The subscriber stream is data only, we don't expect anything here    
+        }
+    });
+    return datachannel;
+}
+
+/***/ }),
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22151,7 +22302,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.startStream = startStream;
 exports.subscribeStreaming = subscribeStreaming;
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -22265,7 +22416,7 @@ function subscribeStreaming(janus, opaqueId, callback) {
 }
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22276,7 +22427,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.subscribeRemoteFeed = subscribeRemoteFeed;
 
-var _janus = __webpack_require__(12);
+var _janus = __webpack_require__(11);
 
 var _janus2 = _interopRequireDefault(_janus);
 
@@ -22355,16 +22506,16 @@ function subscribeRemoteFeed(janus, opaqueId, room, id, pvtId, display, audio, v
 }
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(75)(false);
+exports = module.exports = __webpack_require__(77)(false);
 // Module
 exports.push([module.i, "body{\n  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif\n}\n\n.janus-video{\n  width: 500px;\n  height: 500px;\n}\n\n.janus-video-container{\n  background-color: #000;\n  width: 100%;\n}\n.janus-video-container .video-react.video-react-fluid {\n  padding-top: 62.5% !important\n}\n.janus-video-player{\n  width: 100%;\n  height: 300px;\n}\n\n.janus-video-status{\n  width: 100%;\n  position: absolute;\n  z-index: 100;\n  height: 20px;\n  padding-right: 10px;\n  padding-top: 5px;\n  text-align: right;\n  color: #fff;\n  font-size: 12px;\n}\n\n.janus-video-controls{\n  height: 40px;\n  background-color: #333;\n  display: flex;\n  flex-direction: row;\n  padding-left:10px;\n  padding-top: 5px;\n}\n\n.janus-btn{\n  font-size: 12px;\n  margin-right: 10px;\n  color: #fff;\n  border: 1px solid #fff;\n  border-radius: 5px;\n  height: 20px;\n  padding: 5px;\n  line-height: 20px;\n}\n\n.janus-btn:hover{\n  cursor: pointer;\n  background-color: #0000009a;\n}\n\n.janus-select{\n  margin-left: auto;\n  padding-right: 10px;\n  padding-top: 3px;\n}\n\n.janus-select select{\n  background-color: #0c71a0;\n  color: #fff;\n  padding: 5px;\n  border: 1px solid #fff;\n  border-radius: 5px;\n  /* height: 50px; */\n  appearance: none;\n  /* line-height: 50px */\n}\n\n.janus-select select:focus{\n  outline: none;\n}", ""]);
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22460,7 +22611,7 @@ function toComment(sourceMap) {
 }
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22557,7 +22708,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22667,7 +22818,7 @@ module.exports = checkPropTypes;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22738,7 +22889,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22752,10 +22903,10 @@ module.exports = function() {
 
 
 var ReactIs = __webpack_require__(31);
-var assign = __webpack_require__(76);
+var assign = __webpack_require__(78);
 
 var ReactPropTypesSecret = __webpack_require__(23);
-var checkPropTypes = __webpack_require__(77);
+var checkPropTypes = __webpack_require__(79);
 
 var has = Function.call.bind(Object.prototype.hasOwnProperty);
 var printWarning = function() {};
@@ -23337,7 +23488,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23581,7 +23732,7 @@ exports.isSuspense = isSuspense;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23603,7 +23754,7 @@ exports.isElement=function(a){return"object"===typeof a&&null!==a&&a.$$typeof===
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23614,7 +23765,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "combineReducers", function() { return combineReducers; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compose", function() { return compose; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return createStore; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_symbol_observable__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_symbol_observable__ = __webpack_require__(87);
 
 
 /**
@@ -24282,7 +24433,7 @@ if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(15)))
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26146,7 +26297,7 @@ module.exports = function(window, edgeVersion) {
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26434,11 +26585,11 @@ module.exports = function (list, options) {
 };
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global, module) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ponyfill_js__ = __webpack_require__(86);
+/* WEBPACK VAR INJECTION */(function(global, module) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ponyfill_js__ = __webpack_require__(88);
 /* global window */
 
 
@@ -26459,10 +26610,10 @@ if (typeof self !== 'undefined') {
 var result = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__ponyfill_js__["a" /* default */])(root);
 /* harmony default export */ __webpack_exports__["a"] = (result);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(100), __webpack_require__(101)(module)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(102), __webpack_require__(103)(module)))
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -26487,7 +26638,7 @@ function symbolObservablePonyfill(root) {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26508,11 +26659,11 @@ var _classCallCheck2 = _interopRequireDefault(__webpack_require__(4));
 
 var _createClass2 = _interopRequireDefault(__webpack_require__(5));
 
-var _redux = __webpack_require__(82);
+var _redux = __webpack_require__(84);
 
 var _reducers = _interopRequireDefault(__webpack_require__(57));
 
-var playerActions = _interopRequireWildcard(__webpack_require__(17));
+var playerActions = _interopRequireWildcard(__webpack_require__(18));
 
 var videoActions = _interopRequireWildcard(__webpack_require__(24));
 
@@ -26607,7 +26758,7 @@ function () {
 exports["default"] = Manager;
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26624,9 +26775,9 @@ exports["default"] = void 0;
 
 var _objectSpread2 = _interopRequireDefault(__webpack_require__(14));
 
-var _defineProperty2 = _interopRequireDefault(__webpack_require__(20));
+var _defineProperty2 = _interopRequireDefault(__webpack_require__(21));
 
-var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(21));
+var _objectWithoutProperties2 = _interopRequireDefault(__webpack_require__(22));
 
 var _classCallCheck2 = _interopRequireDefault(__webpack_require__(4));
 
@@ -26646,7 +26797,7 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _classnames = _interopRequireDefault(__webpack_require__(3));
 
-var _Manager = _interopRequireDefault(__webpack_require__(87));
+var _Manager = _interopRequireDefault(__webpack_require__(89));
 
 var _BigPlayButton = _interopRequireDefault(__webpack_require__(34));
 
@@ -26662,11 +26813,11 @@ var _Shortcut = _interopRequireDefault(__webpack_require__(38));
 
 var _ControlBar = _interopRequireDefault(__webpack_require__(40));
 
-var browser = _interopRequireWildcard(__webpack_require__(99));
+var browser = _interopRequireWildcard(__webpack_require__(101));
 
-var _dom = __webpack_require__(18);
+var _dom = __webpack_require__(19);
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var _fullscreen = _interopRequireDefault(__webpack_require__(58));
 
@@ -27141,7 +27292,7 @@ Player.defaultProps = defaultProps;
 Player.displayName = 'Player';
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27331,7 +27482,7 @@ var _default = ClosedCaptionButton;
 exports["default"] = _default;
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27360,7 +27511,7 @@ var _react = _interopRequireWildcard(__webpack_require__(1));
 
 var _PlaybackRateMenuButton = _interopRequireDefault(__webpack_require__(26));
 
-var _utils = __webpack_require__(11);
+var _utils = __webpack_require__(12);
 
 var PlaybackRate =
 /*#__PURE__*/
@@ -27389,7 +27540,7 @@ exports["default"] = PlaybackRate;
 PlaybackRate.displayName = 'PlaybackRate';
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27463,7 +27614,7 @@ Menu.propTypes = propTypes;
 Menu.displayName = 'Menu';
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27552,7 +27703,7 @@ MenuItem.propTypes = propTypes;
 MenuItem.displayName = 'MenuItem';
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27627,7 +27778,7 @@ Popup.propTypes = propTypes;
 Popup.displayName = 'Popup';
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27652,7 +27803,7 @@ var _classnames = _interopRequireDefault(__webpack_require__(3));
 
 var _ClickableComponent = _interopRequireDefault(__webpack_require__(35));
 
-var _Popup = _interopRequireDefault(__webpack_require__(93));
+var _Popup = _interopRequireDefault(__webpack_require__(95));
 
 var propTypes = {
   inline: _propTypes["default"].bool,
@@ -27685,7 +27836,7 @@ PopupButton.defaultProps = defaultProps;
 PopupButton.displayName = 'PopupButton';
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27722,7 +27873,7 @@ var _classnames = _interopRequireDefault(__webpack_require__(3));
 
 var _Slider = _interopRequireDefault(__webpack_require__(25));
 
-var _VolumeLevel = _interopRequireDefault(__webpack_require__(96));
+var _VolumeLevel = _interopRequireDefault(__webpack_require__(98));
 
 var propTypes = {
   actions: _propTypes["default"].object,
@@ -27876,7 +28027,7 @@ var _default = VolumeBar;
 exports["default"] = _default;
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27932,7 +28083,7 @@ var _default = VolumeLevel;
 exports["default"] = _default;
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27947,7 +28098,7 @@ exports["default"] = operation;
 
 var _objectSpread2 = _interopRequireDefault(__webpack_require__(14));
 
-var _player = __webpack_require__(17);
+var _player = __webpack_require__(18);
 
 var initialState = {
   count: 0,
@@ -27974,7 +28125,7 @@ function operation() {
 }
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27991,7 +28142,7 @@ var _objectSpread2 = _interopRequireDefault(__webpack_require__(14));
 
 var _video = __webpack_require__(24);
 
-var _player = __webpack_require__(17);
+var _player = __webpack_require__(18);
 
 var initialState = {
   currentSrc: null,
@@ -28130,7 +28281,7 @@ function player() {
 }
 
 /***/ }),
-/* 99 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28164,7 +28315,7 @@ var IS_IOS = IS_IPHONE || IS_IPAD || IS_IPOD;
 exports.IS_IOS = IS_IOS;
 
 /***/ }),
-/* 100 */
+/* 102 */
 /***/ (function(module, exports) {
 
 var g;
@@ -28191,7 +28342,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 101 */
+/* 103 */
 /***/ (function(module, exports) {
 
 module.exports = function(originalModule) {
@@ -28221,12 +28372,12 @@ module.exports = function(originalModule) {
 
 
 /***/ }),
-/* 102 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__adapter_factory_js__ = __webpack_require__(103);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__adapter_factory_js__ = __webpack_require__(105);
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -28245,17 +28396,17 @@ const adapter = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__adapter_facto
 
 
 /***/ }),
-/* 103 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = adapterFactory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__chrome_chrome_shim__ = __webpack_require__(104);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__edge_edge_shim__ = __webpack_require__(108);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__firefox_firefox_shim__ = __webpack_require__(112);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__safari_safari_shim__ = __webpack_require__(115);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__common_shim__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__chrome_chrome_shim__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__edge_edge_shim__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__firefox_firefox_shim__ = __webpack_require__(114);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__safari_safari_shim__ = __webpack_require__(117);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__common_shim__ = __webpack_require__(109);
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -28393,7 +28544,7 @@ function adapterFactory({window} = {}, options = {
 
 
 /***/ }),
-/* 104 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28408,9 +28559,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["shimPeerConnection"] = shimPeerConnection;
 /* harmony export (immutable) */ __webpack_exports__["fixNegotiationNeeded"] = fixNegotiationNeeded;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_js__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getusermedia__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getusermedia__ = __webpack_require__(108);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetUserMedia", function() { return __WEBPACK_IMPORTED_MODULE_1__getusermedia__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__ = __webpack_require__(107);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetDisplayMedia", function() { return __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__["a"]; });
 
 /*
@@ -29137,7 +29288,7 @@ function fixNegotiationNeeded(window) {
 
 
 /***/ }),
-/* 105 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29195,7 +29346,7 @@ function shimGetDisplayMedia(window, getSourceId) {
 
 
 /***/ }),
-/* 106 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29394,7 +29545,7 @@ function shimGetUserMedia(window) {
 
 
 /***/ }),
-/* 107 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29749,7 +29900,7 @@ function removeAllowExtmapMixed(window) {
 
 
 /***/ }),
-/* 108 */
+/* 110 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29757,12 +29908,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["shimPeerConnection"] = shimPeerConnection;
 /* harmony export (immutable) */ __webpack_exports__["shimReplaceTrack"] = shimReplaceTrack;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__filtericeservers__ = __webpack_require__(109);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rtcpeerconnection_shim__ = __webpack_require__(83);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__filtericeservers__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rtcpeerconnection_shim__ = __webpack_require__(85);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rtcpeerconnection_shim___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rtcpeerconnection_shim__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getusermedia__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getusermedia__ = __webpack_require__(113);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetUserMedia", function() { return __WEBPACK_IMPORTED_MODULE_3__getusermedia__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__getdisplaymedia__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__getdisplaymedia__ = __webpack_require__(112);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetDisplayMedia", function() { return __WEBPACK_IMPORTED_MODULE_4__getdisplaymedia__["a"]; });
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -29858,7 +30009,7 @@ function shimReplaceTrack(window) {
 
 
 /***/ }),
-/* 109 */
+/* 111 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29918,7 +30069,7 @@ function filterIceServers(iceServers, edgeVersion) {
 
 
 /***/ }),
-/* 110 */
+/* 112 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29950,7 +30101,7 @@ function shimGetDisplayMedia(window) {
 
 
 /***/ }),
-/* 111 */
+/* 113 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29989,7 +30140,7 @@ function shimGetUserMedia(window) {
 
 
 /***/ }),
-/* 112 */
+/* 114 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -30001,9 +30152,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["shimRemoveStream"] = shimRemoveStream;
 /* harmony export (immutable) */ __webpack_exports__["shimRTCDataChannel"] = shimRTCDataChannel;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getusermedia__ = __webpack_require__(114);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getusermedia__ = __webpack_require__(116);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetUserMedia", function() { return __WEBPACK_IMPORTED_MODULE_1__getusermedia__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__ = __webpack_require__(113);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__ = __webpack_require__(115);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "shimGetDisplayMedia", function() { return __WEBPACK_IMPORTED_MODULE_2__getdisplaymedia__["a"]; });
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -30200,7 +30351,7 @@ function shimRTCDataChannel(window) {
 
 
 /***/ }),
-/* 113 */
+/* 115 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -30244,7 +30395,7 @@ function shimGetDisplayMedia(window, preferredMediaSource) {
 
 
 /***/ }),
-/* 114 */
+/* 116 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -30321,7 +30472,7 @@ function shimGetUserMedia(window) {
 
 
 /***/ }),
-/* 115 */
+/* 117 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
