@@ -6,6 +6,7 @@ import JanusPublisher from './JanusPublisher';
 import JanusSubscriber from './JanusSubscriber';
 import JanusStreamer from './JanusStreamer';
 import JanusPlayer from './JanusPlayer';
+import JanusDatachannel from './JanusDatachannel';
 
 export {
     Janus,
@@ -14,5 +15,6 @@ export {
     JanusPublisher,
     JanusSubscriber,
     JanusStreamer,
-    JanusPlayer
+    JanusPlayer,
+    JanusDatachannel
 }
