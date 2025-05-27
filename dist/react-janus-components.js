@@ -21503,10 +21503,12 @@ var JanusDatachannel = _react2.default.forwardRef(function (_ref, ref) {
     (0, _react.useEffect)(function () {
         var unmounted = false;
         if (!janus && !unmounted) {
+            console.log("Janus is not available");
             return;
         }
 
         if (!unmounted) {
+            console.log("[Datachannel] Subscribe datachannel");
             (0, _datachannel2.subscribeDatachannel)(janus, opaqueId, datachannelCallback);
         }
         return function () {
@@ -22508,7 +22510,7 @@ function subscribeDatachannel(janus, opaqueId, callback) {
         opaqueId: opaqueId,
         success: function success(pluginHandle) {
             datachannel = pluginHandle;
-            _janus2.default.log("Data channel Plugin attached! (" + datachannel.getPlugin() + ", id=" + datachannel.getId() + ")");
+            console.log("Data channel Plugin attached! (" + datachannel.getPlugin() + ", id=" + datachannel.getId() + ")");
             var body = { "request": "watch", id: parseInt(selectedDataChannel) };
             datachannel.send({ "message": body });
         },

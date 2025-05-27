@@ -8,7 +8,7 @@ export function subscribeDatachannel(janus, opaqueId, callback) {
             opaqueId: opaqueId,
             success: function(pluginHandle) {
                 datachannel = pluginHandle;
-                Janus.log("Data channel Plugin attached! (" + datachannel.getPlugin() + ", id=" + datachannel.getId() + ")");
+                console.log("Data channel Plugin attached! (" + datachannel.getPlugin() + ", id=" + datachannel.getId() + ")");
                 var body = { "request": "watch", id: parseInt(selectedDataChannel)};
                 datachannel.send({"message": body});
             },

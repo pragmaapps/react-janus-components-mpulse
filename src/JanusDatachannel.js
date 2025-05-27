@@ -12,10 +12,12 @@ const JanusDatachannel = React.forwardRef((
     useEffect(() => {
         let unmounted = false;
         if (!janus && !unmounted) {
+            console.log("Janus is not available");
             return;
         }
 
         if (!unmounted) {
+            console.log("[Datachannel] Subscribe datachannel");
             subscribeDatachannel(janus, opaqueId, datachannelCallback);
         }
         return () => {
