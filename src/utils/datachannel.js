@@ -1,5 +1,5 @@
 import Janus from './janus';
-export function subscribeDatachannel(janus, opaqueId, callback) {
+export function subscribeDatachannel(janus, opaqueId,logToBackend, callback) {
     let datachannel = null;
     let selectedDataChannel = 15;
     janus.attach(
@@ -44,7 +44,9 @@ export function subscribeDatachannel(janus, opaqueId, callback) {
                 callback(datachannel, "ondataopen", datachannel);
             },
             ondata: function(datachannel) {
-                console.log("We got data from the DataChannel!", datachannel);
+                const timestamp = Date.now(); // Unix Epoch timestamp in milliseconds
+                console.log("[DataChannel Utils] We got data from the DataChannel!", datachannel);
+                logToBackend(`[${timestamp}]:  We got data from the DataChannel! ${datachannel}`); // send to backend
                 //callback(datachannel, "ondata", datachannel);
             },
             oncleanup: function() {

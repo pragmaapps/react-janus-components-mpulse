@@ -6,7 +6,7 @@ let dataChannelData = '';
 let timer = '';
 const JanusDatachannel = React.forwardRef((
     {
-        janus, opaqueId, streamId, handleDataChannelData
+        janus, opaqueId, streamId, handleDataChannelData, logToBackend
     }, ref) => {
 
     useEffect(() => {
@@ -18,7 +18,7 @@ const JanusDatachannel = React.forwardRef((
 
         if (!unmounted) {
             console.log("[Datachannel] Subscribe datachannel");
-            subscribeDatachannel(janus, opaqueId, datachannelCallback);
+            subscribeDatachannel(janus, opaqueId,logToBackend, datachannelCallback);
         }
         return () => {
             unmounted = true;

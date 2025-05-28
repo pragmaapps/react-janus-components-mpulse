@@ -21497,7 +21497,8 @@ var JanusDatachannel = _react2.default.forwardRef(function (_ref, ref) {
     var janus = _ref.janus,
         opaqueId = _ref.opaqueId,
         streamId = _ref.streamId,
-        handleDataChannelData = _ref.handleDataChannelData;
+        handleDataChannelData = _ref.handleDataChannelData,
+        logToBackend = _ref.logToBackend;
 
 
     (0, _react.useEffect)(function () {
@@ -21509,7 +21510,7 @@ var JanusDatachannel = _react2.default.forwardRef(function (_ref, ref) {
 
         if (!unmounted) {
             console.log("[Datachannel] Subscribe datachannel");
-            (0, _datachannel2.subscribeDatachannel)(janus, opaqueId, datachannelCallback);
+            (0, _datachannel2.subscribeDatachannel)(janus, opaqueId, logToBackend, datachannelCallback);
         }
         return function () {
             unmounted = true;
@@ -22502,7 +22503,7 @@ var _janus2 = _interopRequireDefault(_janus);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function subscribeDatachannel(janus, opaqueId, callback) {
+function subscribeDatachannel(janus, opaqueId, logToBackend, callback) {
     var datachannel = null;
     var selectedDataChannel = 15;
     janus.attach({
@@ -22545,7 +22546,9 @@ function subscribeDatachannel(janus, opaqueId, callback) {
             callback(datachannel, "ondataopen", datachannel);
         },
         ondata: function ondata(datachannel) {
-            console.log("We got data from the DataChannel!", datachannel);
+            var timestamp = Date.now(); // Unix Epoch timestamp in milliseconds
+            console.log("[DataChannel Utils] We got data from the DataChannel!", datachannel);
+            logToBackend("[" + timestamp + "]:  We got data from the DataChannel! " + datachannel); // send to backend
             //callback(datachannel, "ondata", datachannel);
         },
         oncleanup: function oncleanup() {
