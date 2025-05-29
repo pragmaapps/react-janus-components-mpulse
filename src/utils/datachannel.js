@@ -61,7 +61,7 @@ export function echotestDatachannel(janus, opaqueId,logToBackend, callback) {
     let echotest = null;
     janus.attach(
         {
-            plugin: janus.plugin.echotest,
+            plugin: "janus.plugin.echotest",
             opaqueId: opaqueId,
             success: function(pluginHandle) {
                 echotest = pluginHandle;
