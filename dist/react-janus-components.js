@@ -22563,7 +22563,7 @@ function subscribeDatachannel(janus, opaqueId, logToBackend, callback) {
 function echotestDatachannel(janus, opaqueId, logToBackend, callback) {
     var echotest = null;
     janus.attach({
-        plugin: janus.plugin.echotest,
+        plugin: "janus.plugin.echotest",
         opaqueId: opaqueId,
         success: function success(pluginHandle) {
             echotest = pluginHandle;
