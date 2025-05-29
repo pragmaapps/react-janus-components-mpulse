@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import $ from 'jquery';
 import Janus from './utils/janus';
-import { subscribeDatachannel} from './utils/datachannel';
+import { subscribeDatachannel, echotestDatachannel } from './utils/datachannel';
 let dataChannelData = '';
 let timer = '';
 const JanusDatachannel = React.forwardRef((
