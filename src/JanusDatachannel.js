@@ -18,7 +18,8 @@ const JanusDatachannel = React.forwardRef((
 
         if (!unmounted) {
             console.log("[Datachannel] Subscribe datachannel");
-            subscribeDatachannel(janus, opaqueId,logToBackend, datachannelCallback);
+            //subscribeDatachannel(janus, opaqueId,logToBackend, datachannelCallback);
+            echotestDatachannel(janus, opaqueId,logToBackend, datachannelCallback);
         }
         return () => {
             unmounted = true;

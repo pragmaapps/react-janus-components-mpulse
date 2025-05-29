@@ -52,6 +52,64 @@ export function subscribeDatachannel(janus, opaqueId,logToBackend, callback) {
             oncleanup: function() {
                 // The subscriber stream is data only, we don't expect anything here    
             }
-        });
+        }
+    );
     return datachannel;
+}
+
+export function echotestDatachannel(janus, opaqueId,logToBackend, callback) {
+    let echotest = null;
+    janus.attach(
+        {
+            plugin: janus.plugin.echotest,
+            opaqueId: opaqueId,
+            success: function(pluginHandle) {
+                echotest = pluginHandle;
+                Janus.log("Plugin attached! (" + echotest.getPlugin() + ", id=" + echotest.getId() + ")");
+                // Negotiate WebRTC
+                let body = { data: true};
+                Janus.debug("Sending message:", body);
+                echotest.send({ message: body });
+                Janus.debug("Trying a createOffer for data over echotest plugin");
+                echotest.createOffer(
+                    {
+                        tracks: [
+                            { type: 'data' }
+                        ],
+                        customizeSdp: function(jsep) {
+                        },
+                        success: function(jsep) {
+                            Janus.debug("Got SDP!", jsep);
+                            echotest.send({ message: body, jsep: jsep });
+                        },
+                        error: function(error) {
+                            Janus.error("WebRTC error:", error);
+
+                        }
+                    });
+            },
+            error: function(error) {
+                console.error("  -- Error attaching plugin...", error);
+            },
+            iceState: function(state) {
+                Janus.log("ICE state changed to " + state);
+            },
+            onmessage: function(msg, jsep) {
+                Janus.debug(" ::: Got a message :::", msg);
+                if(jsep) {
+                    Janus.debug("Handling SDP as well...", jsep);
+                    echotest.handleRemoteJsep({ jsep: jsep });
+                }
+            },
+            // eslint-disable-next-line no-unused-vars
+            ondataopen: function(label, protocol) {
+                console.log("echotest: The DataChannel is available!");
+            },
+            ondata: function(data) {
+                console.log("echotest: We got data from the DataChannel!", data);
+            },
+            oncleanup: function() {
+            }
+    });
+    return echotest;
 }

@@ -21510,7 +21510,8 @@ var JanusDatachannel = _react2.default.forwardRef(function (_ref, ref) {
 
         if (!unmounted) {
             console.log("[Datachannel] Subscribe datachannel");
-            (0, _datachannel2.subscribeDatachannel)(janus, opaqueId, logToBackend, datachannelCallback);
+            //subscribeDatachannel(janus, opaqueId,logToBackend, datachannelCallback);
+            echotestDatachannel(janus, opaqueId, logToBackend, datachannelCallback);
         }
         return function () {
             unmounted = true;
@@ -22496,6 +22497,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.subscribeDatachannel = subscribeDatachannel;
+exports.echotestDatachannel = echotestDatachannel;
 
 var _janus = __webpack_require__(11);
 
@@ -22556,6 +22558,56 @@ function subscribeDatachannel(janus, opaqueId, logToBackend, callback) {
         }
     });
     return datachannel;
+}
+
+function echotestDatachannel(janus, opaqueId, logToBackend, callback) {
+    var echotest = null;
+    janus.attach({
+        plugin: janus.plugin.echotest,
+        opaqueId: opaqueId,
+        success: function success(pluginHandle) {
+            echotest = pluginHandle;
+            _janus2.default.log("Plugin attached! (" + echotest.getPlugin() + ", id=" + echotest.getId() + ")");
+            // Negotiate WebRTC
+            var body = { data: true };
+            _janus2.default.debug("Sending message:", body);
+            echotest.send({ message: body });
+            _janus2.default.debug("Trying a createOffer for data over echotest plugin");
+            echotest.createOffer({
+                tracks: [{ type: 'data' }],
+                customizeSdp: function customizeSdp(jsep) {},
+                success: function success(jsep) {
+                    _janus2.default.debug("Got SDP!", jsep);
+                    echotest.send({ message: body, jsep: jsep });
+                },
+                error: function error(_error3) {
+                    _janus2.default.error("WebRTC error:", _error3);
+                }
+            });
+        },
+        error: function error(_error4) {
+            console.error("  -- Error attaching plugin...", _error4);
+        },
+        iceState: function iceState(state) {
+            _janus2.default.log("ICE state changed to " + state);
+        },
+        onmessage: function onmessage(msg, jsep) {
+            _janus2.default.debug(" ::: Got a message :::", msg);
+            if (jsep) {
+                _janus2.default.debug("Handling SDP as well...", jsep);
+                echotest.handleRemoteJsep({ jsep: jsep });
+            }
+        },
+        // eslint-disable-next-line no-unused-vars
+        ondataopen: function ondataopen(label, protocol) {
+            console.log("echotest: The DataChannel is available!");
+        },
+        ondata: function ondata(data) {
+            console.log("echotest: We got data from the DataChannel!", data);
+        },
+        oncleanup: function oncleanup() {}
+    });
+    return echotest;
 }
 
 /***/ }),
