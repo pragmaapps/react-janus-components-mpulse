@@ -44,9 +44,7 @@ export function subscribeDatachannel(janus, opaqueId,logToBackend, callback) {
                 callback(datachannel, "ondataopen", datachannel);
             },
             ondata: function(datachannel) {
-                const timestamp = Date.now(); // Unix Epoch timestamp in milliseconds
-                console.log("[DataChannel Utils] We got data from the DataChannel!", datachannel);
-                logToBackend(`[${timestamp}]:  We got data from the DataChannel! ${datachannel}`); // send to backend
+                logToBackend(datachannel);
                 //callback(datachannel, "ondata", datachannel);
             },
             oncleanup: function() {
