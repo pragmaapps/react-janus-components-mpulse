@@ -1,7 +1,5 @@
-import React, { component, useRef, useState, useEffect } from 'react';
-import { Player, ControlBar, ReplayControl,
-	ForwardControl, CurrentTimeDisplay,
-	TimeDivider, PlaybackRateMenuButton, VolumeMenuButton,Shortcut, BigPlayButton, PlayToggle, DurationDisplay, ProgressControl, FullscreenToggle} from 'video-react';
+import React, { useRef, useState, useEffect } from 'react';
+import ReactPlayer from 'react-player';
 
 const JanusStreamPlayer = React.forwardRef((
     { 
@@ -95,28 +93,13 @@ const JanusStreamPlayer = React.forwardRef((
                 </div>*/}
             {(overlayImage || cropperActive) ? '' :(showFramesRate)? (<div className="janus-video-status">{bitrate}</div>):""}
             {overlayImage}
-            <Player playsInline autoPlay muted ref={ref}>
-                {
-                    enableCustomControl ?
-                    (
-                        <ControlBar className="janus-control-bar-align-top">
-                            {customVideoControls}
-                            <VolumeMenuButton disabled />
-                            <DurationDisplay disabled />
-                            <ProgressControl disabled />
-                            <PlayToggle disabled />
-                            <TimeDivider disabled />
-                            <CurrentTimeDisplay disabled />
-                            <PlaybackRateMenuButton disabled />
-                            <ForwardControl disabled />
-                        </ControlBar>
-                    ) :
-                    (
-                        <ControlBar disableCompletely={true} />
-                    )
-                }
-                <Shortcut clickable={playPauseButton===undefined ? false : playPauseButton} shortcuts={newShortcuts} dblclickable={playPauseButton===undefined ? false : playPauseButton} />
-            </Player>
+            <video ref={ref} autoplay muted playsInline width="100%" height="100%"
+            />
+            {enableCustomControl && customVideoControls && (
+                <div className="janus-control-bar-align-top">
+                    {customVideoControls}
+                </div>
+            )}
             {isPublisher && (
                 <div className="janus-video-controls">
                     {status === "Paused" && (
