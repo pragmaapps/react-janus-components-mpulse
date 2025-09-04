@@ -93,8 +93,10 @@ const JanusStreamPlayer = React.forwardRef((
                 </div>*/}
             {(overlayImage || cropperActive) ? '' :(showFramesRate)? (<div className="janus-video-status">{bitrate}</div>):""}
             {overlayImage}
-            <video ref={ref} autoplay muted playsInline width="100%" height="100%"
+             <div className='video-react-controls-enabled video-react-has-started video-react-playing video-react-fluid video-react-user-inactive video-react-workinghover video-react' role="region" tabIndex={"-1"} style={{paddingTop: "56.25%;"}}>
+            <video class="video-react-video" ref={ref} autoplay muted playsInline width="100%" height="100%"
             />
+            </div>
             {enableCustomControl && customVideoControls && (
                 <div className="janus-control-bar-align-top">
                     {customVideoControls}

@@ -6,7 +6,33 @@ body{
   width: 500px;
   height: 500px;
 }
-
+.video-react.video-react-fluid, .video-react.video-react-16-9, .video-react.video-react-4-3 {
+    width: 100%;
+    max-width: 100%;
+    height: 0;
+}
+.video-react .video-react-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.video-react {
+    display: block;
+    vertical-align: top;
+    box-sizing: border-box;
+    color: #fff;
+    background-color: #000;
+    position: relative;
+    font-size: 10px;
+    line-height: 1;
+    font-family: serif, Times, "Times New Roman";
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 .janus-video-container{
   background-color: #000;
   width: 100%;
