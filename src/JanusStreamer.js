@@ -7,7 +7,7 @@ import { Video } from 'video-react';
 
 const JanusStreamer = React.forwardRef((
     {
-        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate,playPauseButton, streamIsLive, networkStatus, isRecordPreviewActive
+        janus, opaqueId, streamId, enableCustomControl, customVideoControls, overlayImage, cropperActive, setRecordedPlaybleFile, showFramesRate,playPauseButton, streamIsLive, networkStatus, isRecordPreviewActive, autoPlay=true
     }, ref) => {
     const videoArea = ref;
     const [playerState, setPlayerState] = useState("Ready");
@@ -34,6 +34,8 @@ const JanusStreamer = React.forwardRef((
         }
         return () => {
             unmounted = true;
+            clearInterval(streamInterval);
+            streamInterval = null;
         };
     }, [janus])
 
@@ -114,6 +116,7 @@ const JanusStreamer = React.forwardRef((
                 cropperActive={cropperActive}
                 showFramesRate={showFramesRate}
                 playPauseButton={playPauseButton}
+                autoPlay={autoPlay}
             />
         </div>
     )

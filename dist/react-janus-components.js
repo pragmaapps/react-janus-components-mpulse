@@ -21493,7 +21493,9 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         playPauseButton = _ref.playPauseButton,
         streamIsLive = _ref.streamIsLive,
         networkStatus = _ref.networkStatus,
-        isRecordPreviewActive = _ref.isRecordPreviewActive;
+        isRecordPreviewActive = _ref.isRecordPreviewActive,
+        _ref$autoPlay = _ref.autoPlay,
+        autoPlay = _ref$autoPlay === undefined ? true : _ref$autoPlay;
 
     var videoArea = ref;
 
@@ -21537,6 +21539,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
         }
         return function () {
             unmounted = true;
+            clearInterval(streamInterval);
+            streamInterval = null;
         };
     }, [janus]);
 
@@ -21614,7 +21618,8 @@ var JanusStreamer = _react2.default.forwardRef(function (_ref, ref) {
             bitrate: bitrates,
             cropperActive: cropperActive,
             showFramesRate: showFramesRate,
-            playPauseButton: playPauseButton
+            playPauseButton: playPauseButton,
+            autoPlay: autoPlay
         })
     );
 });
@@ -21937,7 +21942,9 @@ var JanusStreamPlayer = _react2.default.forwardRef(function (_ref, ref) {
         bitrate = _ref.bitrate,
         cropperActive = _ref.cropperActive,
         showFramesRate = _ref.showFramesRate,
-        playPauseButton = _ref.playPauseButton;
+        playPauseButton = _ref.playPauseButton,
+        _ref$autoPlay = _ref.autoPlay,
+        autoPlay = _ref$autoPlay === undefined ? true : _ref$autoPlay;
 
     var newShortcuts = [{
         keyCode: 32, // spacebar
@@ -21992,7 +21999,7 @@ var JanusStreamPlayer = _react2.default.forwardRef(function (_ref, ref) {
         overlayImage,
         _react2.default.createElement(
             _videoReact.Player,
-            { playsInline: true, autoPlay: true, muted: true, ref: ref },
+            { playsInline: true, autoPlay: autoPlay, muted: true, ref: ref },
             enableCustomControl ? _react2.default.createElement(
                 _videoReact.ControlBar,
                 { className: 'janus-control-bar-align-top' },
